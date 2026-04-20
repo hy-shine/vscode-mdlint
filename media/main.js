@@ -3,44 +3,108 @@ const vscode = acquireVsCodeApi();
 const body = document.body;
 const previewContent = document.getElementById('preview-content');
 const contentArea = document.querySelector('.content-area');
-const tocPanel = document.getElementById('toc-panel');
 const tocList = document.getElementById('toc-list');
-const themeModeSelect = document.getElementById('theme-mode-select');
-const previewStyleSelect = document.getElementById('preview-style-select');
-const toggleTocButton = document.getElementById('toggle-toc-button');
+const outlineControl = document.getElementById('outline-control');
+const outlineTrigger = document.getElementById('outline-trigger');
+const floatingControls = document.getElementById('floating-controls');
+const floatingTrigger = document.getElementById('floating-trigger');
+const floatingMenu = document.getElementById('floating-menu');
+const themeOptions = document.getElementById('theme-options');
+const styleOptions = document.getElementById('style-options');
+const exportOptions = document.getElementById('export-options');
 const formatButton = document.getElementById('format-button');
-const exportHtmlButton = document.getElementById('export-html-button');
-const exportPdfButton = document.getElementById('export-pdf-button');
+const themeValueEl = document.getElementById('theme-value');
+const styleValueEl = document.getElementById('style-value');
 
 let currentState = {
-  tocVisible: true,
+  themeMode: 'auto',
+  previewStyle: 'default',
 };
 
 let isScrollingFromEditor = false;
 let scrollSyncDebounce = null;
 
-themeModeSelect.addEventListener('change', () => {
-  vscode.postMessage({ type: 'setThemeMode', value: themeModeSelect.value });
+// --- Outline popup toggle ---
+outlineTrigger.addEventListener('click', (e) => {
+  e.stopPropagation();
+  outlineControl.classList.toggle('is-open');
 });
 
-previewStyleSelect.addEventListener('change', () => {
-  vscode.postMessage({ type: 'setPreviewStyle', value: previewStyleSelect.value });
+// --- Floating menu toggle ---
+floatingTrigger.addEventListener('click', (e) => {
+  e.stopPropagation();
+  floatingControls.classList.toggle('is-open');
 });
 
-toggleTocButton.addEventListener('click', () => {
-  vscode.postMessage({ type: 'toggleToc', value: !currentState.tocVisible });
+// --- Dismiss floating menu on outside click ---
+document.addEventListener('click', (e) => {
+  if (!floatingControls.contains(e.target)) {
+    floatingControls.classList.remove('is-open');
+    collapseAllGroups();
+  }
 });
 
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    outlineControl.classList.remove('is-open');
+    floatingControls.classList.remove('is-open');
+    collapseAllGroups();
+  }
+});
+
+// --- Collapsible group toggle ---
+floatingMenu.addEventListener('click', (e) => {
+  const group = e.target.closest('.floating-menu-group');
+  if (!group) { return; }
+  e.stopPropagation();
+  const wasExpanded = group.classList.contains('is-expanded');
+  collapseAllGroups();
+  if (!wasExpanded) {
+    group.classList.add('is-expanded');
+  }
+});
+
+function collapseAllGroups() {
+  for (const g of floatingMenu.querySelectorAll('.floating-menu-group.is-expanded')) {
+    g.classList.remove('is-expanded');
+  }
+}
+
+// --- Theme option clicks ---
+themeOptions.addEventListener('click', (e) => {
+  const item = e.target.closest('.floating-menu-item');
+  if (!item) { return; }
+  e.stopPropagation();
+  vscode.postMessage({ type: 'setThemeMode', value: item.dataset.value });
+});
+
+// --- Style option clicks ---
+styleOptions.addEventListener('click', (e) => {
+  const item = e.target.closest('.floating-menu-item');
+  if (!item) { return; }
+  e.stopPropagation();
+  vscode.postMessage({ type: 'setPreviewStyle', value: item.dataset.value });
+});
+
+// --- Export option clicks ---
+exportOptions.addEventListener('click', (e) => {
+  const item = e.target.closest('.floating-menu-item');
+  if (!item) { return; }
+  e.stopPropagation();
+  if (item.dataset.value === 'html') {
+    vscode.postMessage({ type: 'exportHtml' });
+  } else if (item.dataset.value === 'pdf') {
+    vscode.postMessage({ type: 'exportPdf' });
+  }
+  floatingControls.classList.remove('is-open');
+  collapseAllGroups();
+});
+
+// --- Format action ---
 formatButton.addEventListener('click', () => {
   vscode.postMessage({ type: 'formatDocument' });
-});
-
-exportHtmlButton.addEventListener('click', () => {
-  vscode.postMessage({ type: 'exportHtml' });
-});
-
-exportPdfButton.addEventListener('click', () => {
-  vscode.postMessage({ type: 'exportPdf' });
+  floatingControls.classList.remove('is-open');
+  collapseAllGroups();
 });
 
 window.addEventListener('message', (event) => {
@@ -73,16 +137,35 @@ window.addEventListener('message', (event) => {
   const state = message.payload;
   currentState = state;
   document.title = state.title;
-  body.dataset.themeMode = state.themeMode;
-  body.dataset.previewStyle = state.previewStyle;
-  themeModeSelect.value = state.themeMode;
-  previewStyleSelect.value = state.previewStyle;
-  tocPanel.classList.toggle('is-visible', state.tocVisible);
+  setBodyPresentation(state.themeMode, state.previewStyle);
+  syncFloatingMenu(state.themeMode, state.previewStyle);
   previewContent.innerHTML = state.html;
   renderToc(state.toc);
   renderMermaidDiagrams();
   updateActiveTocLink();
 });
+
+function setBodyPresentation(themeMode, previewStyle) {
+  body.classList.remove('theme-auto', 'theme-light', 'theme-dark');
+  body.classList.remove('style-default', 'style-github', 'style-notion', 'style-tokyo-night', 'style-obsidian');
+  body.classList.add(`theme-${themeMode}`);
+  body.classList.add(`style-${previewStyle}`);
+}
+
+function syncFloatingMenu(themeMode, previewStyle) {
+  for (const item of themeOptions.querySelectorAll('.floating-menu-item')) {
+    item.classList.toggle('is-active', item.dataset.value === themeMode);
+  }
+  for (const item of styleOptions.querySelectorAll('.floating-menu-item')) {
+    item.classList.toggle('is-active', item.dataset.value === previewStyle);
+  }
+  if (themeValueEl) {
+    themeValueEl.textContent = themeMode.charAt(0).toUpperCase() + themeMode.slice(1).replace('-', ' ');
+  }
+  if (styleValueEl) {
+    styleValueEl.textContent = previewStyle.charAt(0).toUpperCase() + previewStyle.slice(1).replace('-', ' ');
+  }
+}
 
 function renderToc(items) {
   tocList.innerHTML = '';

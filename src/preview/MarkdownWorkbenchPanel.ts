@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { exportHtml, exportPdf } from '../core/export';
 import { getWorkbenchConfig, updatePreviewStyle, updateShowToc, updateThemeMode } from '../core/config';
 import { formatMarkdownDocument } from '../core/formatter';
 import { renderMarkdown } from '../core/markdown';
@@ -7,11 +8,13 @@ import { PreviewState, PreviewStyle, ThemeMode } from '../types';
 
 export class MarkdownWorkbenchPanel implements vscode.Disposable {
   private panel: vscode.WebviewPanel | undefined;
+  private sourceUri: vscode.Uri | undefined;
   private readonly disposables: vscode.Disposable[] = [];
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
   public reveal(editor: vscode.TextEditor): void {
+    this.sourceUri = editor.document.uri;
     if (!this.panel) {
       this.panel = vscode.window.createWebviewPanel(
         'mdWorkbench.preview',
@@ -43,17 +46,22 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
   }
 
   public async update(editor: vscode.TextEditor | undefined): Promise<void> {
-    if (!this.panel || !editor || editor.document.languageId !== 'markdown') {
+    if (!this.panel) {
       return;
     }
 
-    const markdown = editor.document.getText();
+    const document = await this.resolveDocument(editor);
+    if (!document || document.languageId !== 'markdown') {
+      return;
+    }
+
+    const markdown = document.getText();
     const toc = extractToc(markdown);
     const rendered = renderMarkdown(markdown, toc);
     const config = getWorkbenchConfig();
 
     const state: PreviewState = {
-      title: editor.document.fileName.split(/[\\/]/).pop() ?? 'Untitled.md',
+      title: document.fileName.split(/[\\/]/).pop() ?? 'Untitled.md',
       html: rendered.html,
       rawText: markdown,
       toc,
@@ -74,15 +82,17 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
   }
 
   public async formatActiveDocument(): Promise<void> {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor || editor.document.languageId !== 'markdown') {
+    const document = await this.resolveDocument(vscode.window.activeTextEditor);
+    if (!document || document.languageId !== 'markdown') {
       return;
     }
 
-    const formatted = formatMarkdownDocument(editor.document.getText());
+    const editor = await this.resolveEditor(document);
+
+    const formatted = formatMarkdownDocument(document.getText());
     const fullRange = new vscode.Range(
-      editor.document.positionAt(0),
-      editor.document.positionAt(editor.document.getText().length),
+      document.positionAt(0),
+      document.positionAt(document.getText().length),
     );
 
     await editor.edit((editBuilder: vscode.TextEditorEdit) => {
@@ -103,15 +113,15 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     switch (message.type) {
       case 'setThemeMode':
         await updateThemeMode(message.value);
-        await this.update(vscode.window.activeTextEditor);
+        await this.update(undefined);
         return;
       case 'setPreviewStyle':
         await updatePreviewStyle(message.value);
-        await this.update(vscode.window.activeTextEditor);
+        await this.update(undefined);
         return;
       case 'toggleToc':
         await updateShowToc(message.value);
-        await this.update(vscode.window.activeTextEditor);
+        await this.update(undefined);
         return;
       case 'revealLine': {
         const editor = vscode.window.activeTextEditor;
@@ -137,14 +147,43 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
         await this.formatActiveDocument();
         return;
       case 'exportHtml':
-        await vscode.commands.executeCommand('mdWorkbench.exportHtml');
+        if (this.sourceUri) {
+          await exportHtml(this.sourceUri, this.context);
+        }
         return;
       case 'exportPdf':
-        await vscode.commands.executeCommand('mdWorkbench.exportPdf');
+        if (this.sourceUri) {
+          await exportPdf(this.sourceUri, this.context);
+        }
         return;
       default:
         return;
     }
+  }
+
+  private async resolveDocument(editor: vscode.TextEditor | undefined): Promise<vscode.TextDocument | undefined> {
+    if (editor && editor.document.languageId === 'markdown') {
+      this.sourceUri = editor.document.uri;
+      return editor.document;
+    }
+
+    if (!this.sourceUri) {
+      return undefined;
+    }
+
+    return vscode.workspace.openTextDocument(this.sourceUri);
+  }
+
+  private async resolveEditor(document: vscode.TextDocument): Promise<vscode.TextEditor> {
+    const existingEditor = vscode.window.visibleTextEditors.find(
+      (editor) => editor.document.uri.toString() === document.uri.toString(),
+    );
+
+    if (existingEditor) {
+      return existingEditor;
+    }
+
+    return vscode.window.showTextDocument(document, { preserveFocus: true, preview: false });
   }
 
   private getHtml(webview: vscode.Webview): string {
@@ -165,36 +204,53 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     <link href="${katexStyleUri}" rel="stylesheet" />
     <title>Markdown Workbench</title>
   </head>
-  <body data-theme-mode="auto" data-preview-style="default">
+  <body>
     <div class="app-shell">
-      <aside class="toc-panel is-visible" id="toc-panel">
-        <div class="panel-title">Outline</div>
-        <nav id="toc-list" class="toc-list"></nav>
-      </aside>
       <section class="main-panel">
-        <header class="toolbar">
-          <div class="toolbar-group">
-            <span class="brand">Markdown Workbench</span>
+        <div class="outline-control" id="outline-control">
+          <button class="outline-trigger" id="outline-trigger" type="button" aria-label="Outline" title="Outline">&#9776;</button>
+          <div class="outline-panel" id="outline-panel">
+            <div class="outline-panel-title">Outline</div>
+            <nav id="toc-list" class="toc-list"></nav>
           </div>
-          <div class="toolbar-group controls">
-            <select id="theme-mode-select" aria-label="Theme mode">
-              <option value="auto">Auto</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-            <select id="preview-style-select" aria-label="Preview style">
-              <option value="default">Default</option>
-              <option value="github">GitHub</option>
-              <option value="notion">Notion</option>
-              <option value="tokyo-night">Tokyo Night</option>
-              <option value="obsidian">Obsidian</option>
-            </select>
-            <button id="toggle-toc-button" type="button">TOC</button>
-            <button id="format-button" type="button">Format</button>
-            <button id="export-html-button" type="button">HTML</button>
-            <button id="export-pdf-button" type="button">PDF</button>
+        </div>
+        <div class="floating-controls" id="floating-controls">
+          <button class="floating-trigger" id="floating-trigger" type="button" aria-label="Settings" title="Settings">&#9881;</button>
+          <div class="floating-menu" id="floating-menu">
+            <button class="floating-menu-group" data-group="theme" type="button">
+              <span class="floating-menu-group-label">Theme</span>
+              <span class="floating-menu-group-value" id="theme-value">Auto</span>
+              <span class="floating-menu-group-arrow">&#9656;</span>
+            </button>
+            <div class="floating-menu-sub" id="theme-options">
+              <button class="floating-menu-item" data-value="auto">Auto</button>
+              <button class="floating-menu-item" data-value="light">Light</button>
+              <button class="floating-menu-item" data-value="dark">Dark</button>
+            </div>
+            <button class="floating-menu-group" data-group="style" type="button">
+              <span class="floating-menu-group-label">Style</span>
+              <span class="floating-menu-group-value" id="style-value">Default</span>
+              <span class="floating-menu-group-arrow">&#9656;</span>
+            </button>
+            <div class="floating-menu-sub" id="style-options">
+              <button class="floating-menu-item" data-value="default">Default</button>
+              <button class="floating-menu-item" data-value="github">GitHub</button>
+              <button class="floating-menu-item" data-value="notion">Notion</button>
+              <button class="floating-menu-item" data-value="tokyo-night">Tokyo Night</button>
+              <button class="floating-menu-item" data-value="obsidian">Obsidian</button>
+            </div>
+            <div class="floating-menu-divider"></div>
+            <button class="floating-menu-action" id="format-button" type="button">Format Document</button>
+            <button class="floating-menu-group" data-group="export" type="button">
+              <span class="floating-menu-group-label">Export</span>
+              <span class="floating-menu-group-arrow">&#9656;</span>
+            </button>
+            <div class="floating-menu-sub" id="export-options">
+              <button class="floating-menu-item" data-value="html">HTML</button>
+              <button class="floating-menu-item" data-value="pdf">PDF</button>
+            </div>
           </div>
-        </header>
+        </div>
         <main class="content-area">
           <article id="preview-content" class="preview-content"></article>
         </main>
