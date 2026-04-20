@@ -1,0 +1,87 @@
+{
+  "name": "md-workbench",
+  "displayName": "Markdown Workbench",
+  "description": "A Markdown workbench for VS Code with enhanced preview, navigation, theming, and formatting foundations.",
+  "version": "0.0.1",
+  "publisher": "jessy",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other",
+    "Markdown"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mdWorkbench.openPreview",
+        "title": "Markdown Workbench: Open Preview",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "mdWorkbench.formatDocument",
+        "title": "Markdown Workbench: Format Document"
+      },
+      {
+        "command": "mdWorkbench.refreshToc",
+        "title": "Markdown Workbench: Refresh TOC"
+      },
+      {
+        "command": "mdWorkbench.exportHtml",
+        "title": "Markdown Workbench: Export HTML"
+      },
+      {
+        "command": "mdWorkbench.exportPdf",
+        "title": "Markdown Workbench: Export PDF"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "mdWorkbench.openPreview",
+          "when": "resourceLangId == markdown",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Markdown Workbench",
+      "properties": {
+        "mdWorkbench.themeMode": {
+          "type": "string",
+          "enum": ["auto", "light", "dark"],
+          "default": "auto",
+          "description": "Theme mode for the Markdown Workbench preview."
+        },
+        "mdWorkbench.previewStyle": {
+          "type": "string",
+          "enum": ["default", "github", "notion", "tokyo-night", "obsidian"],
+          "default": "default",
+          "description": "Preview style preset for the Markdown Workbench preview. Options: default, github, notion, tokyo-night, obsidian."
+        },
+        "mdWorkbench.showToc": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the table of contents sidebar in the preview."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "esbuild src/extension.ts --bundle --platform=node --outfile=dist/extension.js --external:vscode --format=cjs --sourcemap",
+    "watch": "npm run compile -- --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@types/vscode": "^1.90.0",
+    "esbuild": "^0.25.3",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "highlight.js": "^11.11.1",
+    "katex": "^0.16.22",
+    "marked": "^15.0.12"
+  }
+}
