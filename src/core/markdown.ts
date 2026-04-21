@@ -114,14 +114,19 @@ const shellCommands = [
   'systemctl', 'service', 'journalctl',
   'crontab', 'at',
   'ip', 'ifconfig', 'ping', 'traceroute', 'netstat', 'ss', 'nslookup', 'dig',
-  'gcc', 'g\+\+', 'clang',
+  'gcc', 'g\\+\\+', 'clang',
   'vim', 'nano', 'emacs',
   'man', 'info', 'tldr',
   'jq', 'yq',
   'env', 'export', 'source',
 ];
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 const shellCommandRe = new RegExp(
-  `(?<![\w./-])(?:${shellCommands.join('|')})(?![\w./-])`,
+  `(?<![\\w./-])(?:${shellCommands.map(escapeRegExp).join('|')})(?![\\w./-])`,
   'g',
 );
 

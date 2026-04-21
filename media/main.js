@@ -33,13 +33,15 @@ outlineTrigger.addEventListener('click', (e) => {
 // --- Floating menu toggle ---
 floatingTrigger.addEventListener('click', (e) => {
   e.stopPropagation();
-  floatingControls.classList.toggle('is-open');
+  const isOpen = floatingControls.classList.toggle('is-open');
+  floatingTrigger.setAttribute('aria-expanded', String(isOpen));
 });
 
 // --- Dismiss floating menu on outside click ---
 document.addEventListener('click', (e) => {
   if (!floatingControls.contains(e.target)) {
     floatingControls.classList.remove('is-open');
+    floatingTrigger.setAttribute('aria-expanded', 'false');
     collapseAllGroups();
   }
 });
@@ -48,6 +50,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     outlineControl.classList.remove('is-open');
     floatingControls.classList.remove('is-open');
+    floatingTrigger.setAttribute('aria-expanded', 'false');
     collapseAllGroups();
   }
 });
@@ -61,12 +64,14 @@ floatingMenu.addEventListener('click', (e) => {
   collapseAllGroups();
   if (!wasExpanded) {
     group.classList.add('is-expanded');
+    group.setAttribute('aria-expanded', 'true');
   }
 });
 
 function collapseAllGroups() {
   for (const g of floatingMenu.querySelectorAll('.floating-menu-group.is-expanded')) {
     g.classList.remove('is-expanded');
+    g.setAttribute('aria-expanded', 'false');
   }
 }
 

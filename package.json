@@ -1,8 +1,8 @@
 {
-  "name": "md-workbench",
-  "displayName": "Markdown Workbench",
-  "description": "A Markdown workbench for VS Code with enhanced preview, navigation, theming, and formatting foundations.",
-  "version": "0.0.1",
+  "name": "mdlint",
+  "displayName": "mdlint",
+  "description": "A Markdown linter for VS Code with enhanced preview, navigation, theming, and formatting foundations.",
+  "version": "0.0.1-beta",
   "publisher": "jessy",
   "license": "MIT",
   "engines": {
@@ -13,51 +13,54 @@
     "Markdown"
   ],
   "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
   "contributes": {
     "commands": [
       {
-        "command": "mdWorkbench.openPreview",
-        "title": "Markdown Workbench: Open Preview",
+        "command": "mdlint.openPreview",
+        "title": "mdlint: Open Preview",
         "icon": "$(open-preview)"
       },
       {
-        "command": "mdWorkbench.formatDocument",
-        "title": "Markdown Workbench: Format Document"
+        "command": "mdlint.formatDocument",
+        "title": "mdlint: Format Document"
       },
       {
-        "command": "mdWorkbench.refreshToc",
-        "title": "Markdown Workbench: Refresh TOC"
+        "command": "mdlint.refreshToc",
+        "title": "mdlint: Refresh TOC"
       },
       {
-        "command": "mdWorkbench.exportHtml",
-        "title": "Markdown Workbench: Export HTML"
+        "command": "mdlint.exportHtml",
+        "title": "mdlint: Export HTML"
       }
     ],
     "menus": {
       "editor/title": [
         {
-          "command": "mdWorkbench.openPreview",
+          "command": "mdlint.openPreview",
           "when": "resourceLangId == markdown",
           "group": "navigation"
         }
       ]
     },
     "configuration": {
-      "title": "Markdown Workbench",
+      "title": "mdlint",
       "properties": {
-        "mdWorkbench.themeMode": {
+        "mdlint.themeMode": {
           "type": "string",
           "enum": ["auto", "light", "dark"],
           "default": "auto",
           "description": "Theme mode for the Markdown Workbench preview."
         },
-        "mdWorkbench.previewStyle": {
+        "mdlint.previewStyle": {
           "type": "string",
           "enum": ["default", "github", "notion", "tokyo-night", "obsidian"],
           "default": "default",
           "description": "Preview style preset for the Markdown Workbench preview. Options: default, github, notion, tokyo-night, obsidian."
         },
-        "mdWorkbench.showToc": {
+        "mdlint.showToc": {
           "type": "boolean",
           "default": true,
           "description": "Show the table of contents sidebar in the preview."

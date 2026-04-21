@@ -17,7 +17,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     this.sourceUri = editor.document.uri;
     if (!this.panel) {
       this.panel = vscode.window.createWebviewPanel(
-        'mdWorkbench.preview',
+        'mdlint.preview',
         'Markdown Workbench',
         vscode.ViewColumn.Beside,
         {
@@ -210,10 +210,31 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
           </div>
         </div>
         <div class="floating-controls" id="floating-controls">
-          <button class="floating-trigger" id="floating-trigger" type="button" aria-label="Settings" title="Settings">&#9881;</button>
+          <button class="floating-trigger" id="floating-trigger" type="button" aria-label="Preview settings" title="Preview settings" aria-expanded="false">
+            <span class="floating-trigger-ring"></span>
+            <span class="floating-trigger-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" focusable="false">
+                <path d="M4 5.25h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M4 10h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M4 14.75h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <circle cx="7" cy="5.25" r="1.9" fill="currentColor"/>
+                <circle cx="13" cy="10" r="1.9" fill="currentColor"/>
+                <circle cx="9.5" cy="14.75" r="1.9" fill="currentColor"/>
+              </svg>
+            </span>
+          </button>
           <div class="floating-menu" id="floating-menu">
-            <button class="floating-menu-group" data-group="theme" type="button">
-              <span class="floating-menu-group-label">Theme</span>
+            <div class="floating-menu-header">
+              <div class="floating-menu-eyebrow">Preview</div>
+              <div class="floating-menu-title">Display Settings</div>
+            </div>
+            <div class="floating-menu-section-label">Appearance</div>
+            <button class="floating-menu-group" data-group="theme" type="button" aria-expanded="false">
+              <span class="floating-menu-group-icon" aria-hidden="true">◐</span>
+              <span class="floating-menu-group-copy">
+                <span class="floating-menu-group-label">Theme</span>
+                <span class="floating-menu-group-hint">Match editor or force light and dark</span>
+              </span>
               <span class="floating-menu-group-value" id="theme-value">Auto</span>
               <span class="floating-menu-group-arrow">&#9656;</span>
             </button>
@@ -222,8 +243,12 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
               <button class="floating-menu-item" data-value="light">Light</button>
               <button class="floating-menu-item" data-value="dark">Dark</button>
             </div>
-            <button class="floating-menu-group" data-group="style" type="button">
-              <span class="floating-menu-group-label">Style</span>
+            <button class="floating-menu-group" data-group="style" type="button" aria-expanded="false">
+              <span class="floating-menu-group-icon" aria-hidden="true">✦</span>
+              <span class="floating-menu-group-copy">
+                <span class="floating-menu-group-label">Style</span>
+                <span class="floating-menu-group-hint">Switch the preview mood and typography</span>
+              </span>
               <span class="floating-menu-group-value" id="style-value">Default</span>
               <span class="floating-menu-group-arrow">&#9656;</span>
             </button>
@@ -235,8 +260,21 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
               <button class="floating-menu-item" data-value="obsidian">Obsidian</button>
             </div>
             <div class="floating-menu-divider"></div>
-            <button class="floating-menu-action" id="format-button" type="button">Format Document</button>
-            <button class="floating-menu-action" id="export-button" type="button">Export HTML</button>
+            <div class="floating-menu-section-label">Actions</div>
+            <button class="floating-menu-action" id="format-button" type="button">
+              <span class="floating-menu-action-icon" aria-hidden="true">⌘</span>
+              <span class="floating-menu-action-copy">
+                <span class="floating-menu-action-title">Format Document</span>
+                <span class="floating-menu-action-hint">Clean structure before reading or export</span>
+              </span>
+            </button>
+            <button class="floating-menu-action" id="export-button" type="button">
+              <span class="floating-menu-action-icon" aria-hidden="true">↗</span>
+              <span class="floating-menu-action-copy">
+                <span class="floating-menu-action-title">Export HTML</span>
+                <span class="floating-menu-action-hint">Generate a shareable standalone page</span>
+              </span>
+            </button>
           </div>
         </div>
         <main class="content-area">

@@ -59,9 +59,9 @@ Search for `Markdown Workbench` in VS Code settings:
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| `mdWorkbench.themeMode` | string | `auto` | Theme mode: `auto` / `light` / `dark` |
-| `mdWorkbench.previewStyle` | string | `default` | Preview style: `default` / `github` / `notion` / `tokyo-night` / `obsidian` |
-| `mdWorkbench.showToc` | boolean | `true` | Show table of contents sidebar |
+| `mdlint.themeMode` | string | `auto` | Theme mode: `auto` / `light` / `dark` |
+| `mdlint.previewStyle` | string | `default` | Preview style: `default` / `github` / `notion` / `tokyo-night` / `obsidian` |
+| `mdlint.showToc` | boolean | `true` | Show table of contents sidebar |
 
 ### Commands
 

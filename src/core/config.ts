@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { PreviewStyle, ThemeMode } from '../types';
 
-const SECTION = 'mdWorkbench';
+const SECTION = 'mdlint';
 
 export interface WorkbenchConfig {
   themeMode: ThemeMode;
