@@ -1,10 +1,14 @@
 {
   "name": "mdlint",
-  "displayName": "mdlint",
-  "description": "A Markdown linter for VS Code with enhanced preview, navigation, theming, and formatting foundations.",
-  "version": "0.0.1-beta",
+  "displayName": "MDLint",
+  "description": "Enhanced Markdown preview with multiple themes, table of contents, syntax highlighting, math formulas, and document formatting.",
+  "version": "0.1.0",
   "publisher": "jessy",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hy-shine/vscode-mdlint"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -12,6 +16,10 @@
     "Other",
     "Markdown"
   ],
+  "keywords": [
+    "markdown"
+  ],
+  "icon": "images/icon.png",
   "main": "./dist/extension.js",
   "activationEvents": [
     "onLanguage:markdown"
@@ -52,13 +60,13 @@
           "type": "string",
           "enum": ["auto", "light", "dark"],
           "default": "auto",
-          "description": "Theme mode for the Markdown Workbench preview."
+          "description": "Theme mode for the MDLint preview."
         },
         "mdlint.previewStyle": {
           "type": "string",
           "enum": ["default", "github", "notion", "tokyo-night", "obsidian"],
           "default": "default",
-          "description": "Preview style preset for the Markdown Workbench preview. Options: default, github, notion, tokyo-night, obsidian."
+          "description": "Preview style preset for the MDLint preview. Options: default, github, notion, tokyo-night, obsidian."
         },
         "mdlint.showToc": {
           "type": "boolean",

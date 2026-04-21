@@ -1,95 +1,80 @@
-# Markdown Workbench
+# MDLint
 
-Markdown Workbench is a feature-rich VS Code Markdown extension that provides an enhanced preview experience with theme switching, multiple preview styles, table of contents navigation, code highlighting, math formulas, Mermaid diagrams, scroll synchronization, and export functionality.
+<!-- TODO: Add hero screenshot/GIF here before publishing -->
+<!-- Recommended: 1280x800 showing split view with preview panel -->
 
-### Features
+A polished Markdown preview extension for VS Code. Open a side panel with live rendering, table of contents, scroll sync, multiple themes, math formulas, code highlighting, and one-click HTML export.
 
-- **Enhanced Preview Panel**
-  - Bidirectional scroll synchronization (editor ↔ preview)
-  - Left-side table of contents (TOC) with current section highlighting
-  - Top toolbar (theme toggle, style toggle, format, export)
-  - Preview button in editor title bar
+---
 
-- **Themes & Styles**
-  - Theme modes: Auto / Light / Dark
-  - Preview styles: Default / GitHub / Notion / Tokyo Night / Obsidian
+## Quick Start
 
-- **Rendering Capabilities**
-  - Code highlighting (powered by highlight.js)
-  - Math formulas (powered by KaTeX)
-  - Mermaid diagrams (loaded dynamically via CDN)
+1. Open any `.md` file
+2. Click the preview icon in the editor title bar, or run `mdlint: Open Preview` from the Command Palette
+3. Switch themes and styles from the floating menu in the preview panel
 
-- **Editing Enhancement**
-  - Markdown formatting (list normalization, blockquote spacing, horizontal rule standardization, etc.)
-  - Integration with VS Code native formatting provider
+---
 
-- **Export**
-  - HTML export (standalone file with inline styles)
-  - PDF export (via browser print dialog)
+## Features
 
-### Installation
+### Multiple Preview Styles
 
-1. Install from VS Code Marketplace (when published)
-2. Or manually install the `.vsix` file:
-   ```bash
-   code --install-extension md-workbench-0.0.1.vsix
-   ```
+Choose a look that fits your workflow:
 
-### Usage
+| Style | Description |
+|-------|-------------|
+| **Default** | Follows your VS Code color theme |
+| **GitHub** | Matches GitHub's Markdown rendering |
+| **Notion** | Clean, spacious editorial style |
+| **Tokyo Night** | Low-contrast dark inspired by the editor theme |
+| **Obsidian** | Inspired by the Obsidian app aesthetic |
 
-#### Open Preview
+Each style supports **Auto / Light / Dark** mode and switches with your VS Code theme when set to Auto.
 
-- Click the preview button in the editor title bar (`$(open-preview)` icon)
-- Or use the command palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and search for `Markdown Workbench: Open Preview`
+### Table of Contents & Scroll Sync
 
-#### Format Document
+- TOC sidebar with automatic heading extraction
+- Current section highlight as you scroll
+- Click a heading to jump to the editor
+- Scroll sync between editor and preview
 
-- Click the `Format` button in the toolbar
-- Or use the command palette and search for `Markdown Workbench: Format Document`
-- Or use VS Code native format command (`Shift+Alt+F` / `Shift+Option+F`)
+### Rich Content Support
 
-#### Export
+- **Code highlighting** with copy-to-clipboard buttons
+- **Math formulas** via KaTeX (`$...$` inline, `$$...$$` block)
+- **Mermaid diagrams** rendered on the fly
 
-- **HTML Export**: Click the `HTML` button in the toolbar or search for `Markdown Workbench: Export HTML` in the command palette
-- **PDF Export**: Click the `PDF` button in the toolbar or search for `Markdown Workbench: Export PDF` in the command palette
+### One-Click Export
 
-### Configuration
+Export your Markdown to a standalone HTML file with all styles inlined — ready to share or publish.
 
-Search for `Markdown Workbench` in VS Code settings:
+---
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `mdlint.themeMode` | string | `auto` | Theme mode: `auto` / `light` / `dark` |
-| `mdlint.previewStyle` | string | `default` | Preview style: `default` / `github` / `notion` / `tokyo-night` / `obsidian` |
-| `mdlint.showToc` | boolean | `true` | Show table of contents sidebar |
+## Settings
 
-### Commands
+Search for `mdlint` in VS Code Settings:
 
-| Command | Description |
-|---------|-------------|
-| `Markdown Workbench: Open Preview` | Open preview panel |
-| `Markdown Workbench: Format Document` | Format current document |
-| `Markdown Workbench: Refresh TOC` | Refresh table of contents |
-| `Markdown Workbench: Export HTML` | Export as HTML |
-| `Markdown Workbench: Export PDF` | Export as PDF |
+| Setting | Default | Options |
+|---------|---------|---------|
+| `mdlint.themeMode` | `auto` | `auto` · `light` · `dark` |
+| `mdlint.previewStyle` | `default` | `default` · `github` · `notion` · `tokyo-night` · `obsidian` |
+| `mdlint.showToc` | `true` | `true` · `false` |
 
-### Development
+---
 
-```bash
-# Install dependencies
-npm install
+## Available Commands
 
-# Compile
-npm run compile
+- `mdlint: Open Preview` (`mdlint.openPreview`) — Open the preview panel
+- `mdlint: Format Document` (`mdlint.formatDocument`) — Clean up Markdown structure
+- `mdlint: Refresh TOC` (`mdlint.refreshToc`) — Re-extract headings
+- `mdlint: Export HTML` (`mdlint.exportHtml`) — Save as standalone HTML
 
-# Watch mode
-npm run watch
+---
 
-# Package
-npm install -g @vscode/vsce
-vsce package
-```
+## Changelog
 
-### License
+See [CHANGELOG.md](./CHANGELOG.md).
 
-MIT License
+## License
+
+[MIT License](./LICENSE)

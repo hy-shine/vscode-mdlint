@@ -18,7 +18,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     if (!this.panel) {
       this.panel = vscode.window.createWebviewPanel(
         'mdlint.preview',
-        'Markdown Workbench',
+        'MDLint',
         vscode.ViewColumn.Beside,
         {
           enableScripts: true,
@@ -37,11 +37,12 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
       this.panel.webview.onDidReceiveMessage(async (message: WebviewMessage) => {
         await this.handleMessage(message);
       }, null, this.disposables);
+
+      this.panel.webview.html = this.getHtml(this.panel.webview);
     }
 
-    this.panel.title = `Markdown Workbench · ${editor.document.fileName.split(/[\\/]/).pop() ?? 'Preview'}`;
+    this.panel.title = `MDLint · ${editor.document.fileName.split(/[\\/]/).pop() ?? 'Preview'}`;
     this.panel.reveal(vscode.ViewColumn.Beside);
-    this.panel.webview.html = this.getHtml(this.panel.webview);
     void this.update(editor);
   }
 
@@ -197,7 +198,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="${styleUri}" rel="stylesheet" />
     <link href="${katexStyleUri}" rel="stylesheet" />
-    <title>Markdown Workbench</title>
+    <title>MDLint</title>
   </head>
   <body>
     <div class="app-shell">
@@ -226,14 +227,12 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
           <div class="floating-menu" id="floating-menu">
             <div class="floating-menu-header">
               <div class="floating-menu-eyebrow">Preview</div>
-              <div class="floating-menu-title">Display Settings</div>
             </div>
             <div class="floating-menu-section-label">Appearance</div>
             <button class="floating-menu-group" data-group="theme" type="button" aria-expanded="false">
               <span class="floating-menu-group-icon" aria-hidden="true">◐</span>
               <span class="floating-menu-group-copy">
                 <span class="floating-menu-group-label">Theme</span>
-                <span class="floating-menu-group-hint">Match editor or force light and dark</span>
               </span>
               <span class="floating-menu-group-value" id="theme-value">Auto</span>
               <span class="floating-menu-group-arrow">&#9656;</span>
@@ -247,7 +246,6 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
               <span class="floating-menu-group-icon" aria-hidden="true">✦</span>
               <span class="floating-menu-group-copy">
                 <span class="floating-menu-group-label">Style</span>
-                <span class="floating-menu-group-hint">Switch the preview mood and typography</span>
               </span>
               <span class="floating-menu-group-value" id="style-value">Default</span>
               <span class="floating-menu-group-arrow">&#9656;</span>
@@ -265,14 +263,12 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
               <span class="floating-menu-action-icon" aria-hidden="true">⌘</span>
               <span class="floating-menu-action-copy">
                 <span class="floating-menu-action-title">Format Document</span>
-                <span class="floating-menu-action-hint">Clean structure before reading or export</span>
               </span>
             </button>
             <button class="floating-menu-action" id="export-button" type="button">
               <span class="floating-menu-action-icon" aria-hidden="true">↗</span>
               <span class="floating-menu-action-copy">
                 <span class="floating-menu-action-title">Export HTML</span>
-                <span class="floating-menu-action-hint">Generate a shareable standalone page</span>
               </span>
             </button>
           </div>

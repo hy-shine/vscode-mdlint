@@ -81,6 +81,7 @@ themeOptions.addEventListener('click', (e) => {
   if (!item) { return; }
   e.stopPropagation();
   vscode.postMessage({ type: 'setThemeMode', value: item.dataset.value });
+  collapseAllGroups();
 });
 
 // --- Style option clicks ---
@@ -89,6 +90,7 @@ styleOptions.addEventListener('click', (e) => {
   if (!item) { return; }
   e.stopPropagation();
   vscode.postMessage({ type: 'setPreviewStyle', value: item.dataset.value });
+  collapseAllGroups();
 });
 
 // --- Export action ---

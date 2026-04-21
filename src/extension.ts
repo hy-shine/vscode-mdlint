@@ -8,6 +8,7 @@ export function activate(context: vscode.ExtensionContext): void {
     console.log('[mdlint] activate start');
     const panel = new MarkdownWorkbenchPanel(context);
     const formattingProvider = new MarkdownFormattingProvider();
+    let updateDebounce: NodeJS.Timeout | null = null;
 
     context.subscriptions.push(
       panel,
@@ -15,7 +16,7 @@ export function activate(context: vscode.ExtensionContext): void {
       vscode.commands.registerCommand('mdlint.openPreview', () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor || editor.document.languageId !== 'markdown') {
-          void vscode.window.showInformationMessage('Open a Markdown file to use Markdown Workbench.');
+          void vscode.window.showInformationMessage('Open a Markdown file to use MDLint.');
           return;
         }
 
@@ -38,13 +39,18 @@ export function activate(context: vscode.ExtensionContext): void {
       vscode.window.onDidChangeActiveTextEditor(async (editor: vscode.TextEditor | undefined) => {
         await panel.update(editor);
       }),
-      vscode.workspace.onDidChangeTextDocument(async (event: vscode.TextDocumentChangeEvent) => {
+      vscode.workspace.onDidChangeTextDocument((event: vscode.TextDocumentChangeEvent) => {
         const editor = vscode.window.activeTextEditor;
         if (!editor || event.document !== editor.document) {
           return;
         }
 
-        await panel.update(editor);
+        if (updateDebounce) {
+          clearTimeout(updateDebounce);
+        }
+        updateDebounce = setTimeout(() => {
+          void panel.update(editor);
+        }, 300);
       }),
       vscode.workspace.onDidChangeConfiguration(async (event: vscode.ConfigurationChangeEvent) => {
         if (!event.affectsConfiguration('mdlint')) {

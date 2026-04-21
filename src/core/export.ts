@@ -12,7 +12,9 @@ export async function exportHtml(sourceUri: vscode.Uri, context: vscode.Extensio
   const toc = extractToc(markdownText);
   const rendered = renderMarkdown(markdownText, toc);
 
-  const themeMode = config.themeMode === 'auto' ? 'light' : config.themeMode;
+  const themeMode = config.themeMode === 'auto'
+    ? (vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Light ? 'light' : 'dark')
+    : config.themeMode;
   const styleCss = loadExportCss(context, themeMode, config.previewStyle);
   const katexCss = loadKatexCss(context);
 
