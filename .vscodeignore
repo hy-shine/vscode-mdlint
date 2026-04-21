@@ -1,0 +1,10 @@
+src/**
+tsconfig.json
+node_modules/**
+!node_modules/katex/dist/katex.min.css
+!node_modules/katex/dist/fonts/**
+**/*.map
+.vscode/**
+*.vsix
+README.zh-CN.md
+.gitignore

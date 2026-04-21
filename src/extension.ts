@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { exportHtml, exportPdf } from './core/export';
+import { exportHtml } from './core/export';
 import { MarkdownFormattingProvider } from './formatting/MarkdownFormattingProvider';
 import { MarkdownWorkbenchPanel } from './preview/MarkdownWorkbenchPanel';
 
@@ -32,14 +32,6 @@ export function activate(context: vscode.ExtensionContext): void {
         return;
       }
       await exportHtml(editor.document.uri, context);
-    }),
-    vscode.commands.registerCommand('mdWorkbench.exportPdf', async () => {
-      const editor = vscode.window.activeTextEditor;
-      if (!editor || editor.document.languageId !== 'markdown') {
-        void vscode.window.showInformationMessage('Open a Markdown file to export.');
-        return;
-      }
-      await exportPdf(editor.document.uri, context);
     }),
     vscode.window.onDidChangeActiveTextEditor(async (editor: vscode.TextEditor | undefined) => {
       await panel.update(editor);

@@ -11,8 +11,8 @@ const floatingTrigger = document.getElementById('floating-trigger');
 const floatingMenu = document.getElementById('floating-menu');
 const themeOptions = document.getElementById('theme-options');
 const styleOptions = document.getElementById('style-options');
-const exportOptions = document.getElementById('export-options');
 const formatButton = document.getElementById('format-button');
+const exportButton = document.getElementById('export-button');
 const themeValueEl = document.getElementById('theme-value');
 const styleValueEl = document.getElementById('style-value');
 
@@ -86,16 +86,9 @@ styleOptions.addEventListener('click', (e) => {
   vscode.postMessage({ type: 'setPreviewStyle', value: item.dataset.value });
 });
 
-// --- Export option clicks ---
-exportOptions.addEventListener('click', (e) => {
-  const item = e.target.closest('.floating-menu-item');
-  if (!item) { return; }
-  e.stopPropagation();
-  if (item.dataset.value === 'html') {
-    vscode.postMessage({ type: 'exportHtml' });
-  } else if (item.dataset.value === 'pdf') {
-    vscode.postMessage({ type: 'exportPdf' });
-  }
+// --- Export action ---
+exportButton.addEventListener('click', () => {
+  vscode.postMessage({ type: 'exportHtml' });
   floatingControls.classList.remove('is-open');
   collapseAllGroups();
 });
@@ -142,6 +135,7 @@ window.addEventListener('message', (event) => {
   previewContent.innerHTML = state.html;
   renderToc(state.toc);
   renderMermaidDiagrams();
+  setupCodeCopyButtons();
   updateActiveTocLink();
 });
 
@@ -233,8 +227,7 @@ async function renderMermaidDiagrams() {
 
   for (const block of mermaidBlocks) {
     const pre = block.parentElement;
-    const wrapper = pre?.parentElement;
-    if (!pre || !wrapper) {
+    if (!pre) {
       continue;
     }
 
@@ -248,12 +241,12 @@ async function renderMermaidDiagrams() {
       const container = document.createElement('div');
       container.className = 'mermaid-diagram';
       container.innerHTML = svg;
-      wrapper.replaceWith(container);
+      pre.replaceWith(container);
     } catch {
       const errorDiv = document.createElement('div');
       errorDiv.className = 'mermaid-error';
       errorDiv.textContent = 'Mermaid rendering failed';
-      wrapper.replaceWith(errorDiv);
+      pre.replaceWith(errorDiv);
     }
   }
 }
@@ -296,4 +289,32 @@ async function loadMermaid() {
     script.onerror = () => resolve(null);
     document.head.appendChild(script);
   });
+}
+
+function setupCodeCopyButtons() {
+  const copyButtons = previewContent.querySelectorAll('.code-copy-button');
+  for (const button of copyButtons) {
+    button.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const code = button.dataset.code;
+      if (!code) {
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(code);
+        button.textContent = 'Copied!';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.textContent = 'Copy';
+          button.classList.remove('copied');
+        }, 2000);
+      } catch {
+        button.textContent = 'Failed';
+        setTimeout(() => {
+          button.textContent = 'Copy';
+        }, 2000);
+      }
+    });
+  }
 }

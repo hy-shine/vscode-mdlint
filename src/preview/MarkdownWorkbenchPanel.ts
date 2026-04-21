@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { exportHtml, exportPdf } from '../core/export';
+import { exportHtml } from '../core/export';
 import { getWorkbenchConfig, updatePreviewStyle, updateShowToc, updateThemeMode } from '../core/config';
 import { formatMarkdownDocument } from '../core/formatter';
 import { renderMarkdown } from '../core/markdown';
@@ -151,11 +151,6 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
           await exportHtml(this.sourceUri, this.context);
         }
         return;
-      case 'exportPdf':
-        if (this.sourceUri) {
-          await exportPdf(this.sourceUri, this.context);
-        }
-        return;
       default:
         return;
     }
@@ -192,6 +187,9 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     const katexStyleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.context.extensionUri, 'node_modules', 'katex', 'dist', 'katex.min.css'),
     );
+    const hljsStyleUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.context.extensionUri, 'node_modules', 'highlight.js', 'styles', 'atom-one-dark.css'),
+    );
     const nonce = getNonce();
 
     return `<!DOCTYPE html>
@@ -202,6 +200,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="${styleUri}" rel="stylesheet" />
     <link href="${katexStyleUri}" rel="stylesheet" />
+    <link href="${hljsStyleUri}" rel="stylesheet" />
     <title>Markdown Workbench</title>
   </head>
   <body>
@@ -241,14 +240,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
             </div>
             <div class="floating-menu-divider"></div>
             <button class="floating-menu-action" id="format-button" type="button">Format Document</button>
-            <button class="floating-menu-group" data-group="export" type="button">
-              <span class="floating-menu-group-label">Export</span>
-              <span class="floating-menu-group-arrow">&#9656;</span>
-            </button>
-            <div class="floating-menu-sub" id="export-options">
-              <button class="floating-menu-item" data-value="html">HTML</button>
-              <button class="floating-menu-item" data-value="pdf">PDF</button>
-            </div>
+            <button class="floating-menu-action" id="export-button" type="button">Export HTML</button>
           </div>
         </div>
         <main class="content-area">
@@ -269,8 +261,7 @@ type WebviewMessage =
   | { type: 'revealLine'; value: number }
   | { type: 'formatDocument' }
   | { type: 'scrollToLine'; value: number }
-  | { type: 'exportHtml' }
-  | { type: 'exportPdf' };
+  | { type: 'exportHtml' };
 
 function getNonce(): string {
   return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);

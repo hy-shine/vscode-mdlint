@@ -31,10 +31,6 @@
       {
         "command": "mdWorkbench.exportHtml",
         "title": "Markdown Workbench: Export HTML"
-      },
-      {
-        "command": "mdWorkbench.exportPdf",
-        "title": "Markdown Workbench: Export PDF"
       }
     ],
     "menus": {

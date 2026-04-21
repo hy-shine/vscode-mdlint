@@ -1,11 +1,63 @@
 import hljs from 'highlight.js';
 import katex from 'katex';
-import { marked, Tokens } from 'marked';
+import { marked, TokenizerAndRendererExtension, Tokens } from 'marked';
 import { TocItem } from '../types';
+import { slugify } from './toc';
 
 export interface RenderedMarkdown {
   html: string;
 }
+
+// --- Marked extensions for KaTeX math rendering ---
+// Block math: $$...$$
+const blockMathExtension: TokenizerAndRendererExtension = {
+  name: 'blockMath',
+  level: 'block',
+  start(src: string) {
+    return src.match(/^\$\$/m)?.index ?? -1;
+  },
+  tokenizer(src: string) {
+    const match = src.match(/^\$\$([\s\S]+?)\$\$/);
+    if (!match) {
+      return undefined;
+    }
+    return {
+      type: 'blockMath',
+      raw: match[0],
+      expression: match[1].trim(),
+    };
+  },
+  renderer(token: Tokens.Generic) {
+    return `<p>${katex.renderToString(token.expression as string, { displayMode: true, throwOnError: false })}</p>`;
+  },
+};
+
+// Inline math: $...$
+const inlineMathExtension: TokenizerAndRendererExtension = {
+  name: 'inlineMath',
+  level: 'inline',
+  start(src: string) {
+    return src.match(/(?<!\$)\$(?!\$)/)?.index ?? -1;
+  },
+  tokenizer(src: string) {
+    const match = src.match(/^(?:^|[^\\])\$(?!\$)([^$\n]+?)\$(?!\$)/);
+    if (!match) {
+      return undefined;
+    }
+    return {
+      type: 'inlineMath',
+      raw: match[0],
+      expression: match[1].trim(),
+      prefix: match[0].startsWith('$') ? '' : match[0][0],
+    };
+  },
+  renderer(token: Tokens.Generic) {
+    const prefix = (token.prefix as string) ?? '';
+    return `${prefix}${katex.renderToString(token.expression as string, { displayMode: false, throwOnError: false })}`;
+  },
+};
+
+marked.use({ extensions: [blockMathExtension, inlineMathExtension] });
 
 marked.setOptions({
   gfm: true,
@@ -19,51 +71,24 @@ export function renderMarkdown(markdown: string, toc: TocItem[]): RenderedMarkdo
   const renderer = new marked.Renderer();
   renderer.heading = ({ tokens, depth }: Tokens.Heading) => {
     const text = marked.Parser.parseInline(tokens);
-    const slug = headings.get(text) ?? text.toLowerCase().replace(/\s+/g, '-');
+    const slug = headings.get(text) ?? slugify(text);
     const tocEntry = toc.find((item) => item.text === text);
     const sourceLine = tocEntry ? tocEntry.line : 0;
     return `<h${depth} id="${escapeAttribute(slug)}" data-source-line="${sourceLine}">${text}</h${depth}>`;
   };
   renderer.code = ({ text, lang }: Tokens.Code) => {
     if (lang === 'mermaid') {
-      return `<div class="code-block"><div class="code-block-language">mermaid</div><pre><code class="language-mermaid">${escapeHtml(text)}</code></pre></div>`;
+      return `<pre><code class="language-mermaid">${escapeHtml(text)}</code></pre>`;
     }
     const language = lang && hljs.getLanguage(lang) ? lang : 'plaintext';
     const highlighted = hljs.highlight(text, { language }).value;
-    const languageLabel = lang ? `<div class="code-block-language">${escapeHtml(lang)}</div>` : '';
-    return `<div class="code-block">${languageLabel}<pre><code class="hljs language-${escapeAttribute(language)}">${highlighted}</code></pre></div>`;
+    const copyButton = `<button class="code-copy-button" data-code="${escapeAttribute(text)}" aria-label="Copy code">Copy</button>`;
+    return `<pre>${copyButton}<code class="hljs language-${escapeAttribute(language)}">${highlighted}</code></pre>`;
   };
 
   return {
-    html: marked.parse(renderMath(markdown), { renderer }) as string,
+    html: marked.parse(markdown, { renderer }) as string,
   };
-}
-
-function renderMath(markdown: string): string {
-  const fencedBlockPattern = /(```[\s\S]*?```|~~~[\s\S]*?~~~)/g;
-
-  return markdown
-    .split(fencedBlockPattern)
-    .map((segment) => {
-      if (segment.startsWith('```') || segment.startsWith('~~~')) {
-        return segment;
-      }
-
-      return renderInlineMath(renderBlockMath(segment));
-    })
-    .join('');
-}
-
-function renderBlockMath(input: string): string {
-  return input.replace(/\$\$([\s\S]+?)\$\$/g, (_, expression: string) => {
-    return `\n${katex.renderToString(expression.trim(), { displayMode: true, throwOnError: false })}\n`;
-  });
-}
-
-function renderInlineMath(input: string): string {
-  return input.replace(/(^|[^\\])\$(?!\$)([^$\n]+?)\$/g, (_, prefix: string, expression: string) => {
-    return `${prefix}${katex.renderToString(expression.trim(), { displayMode: false, throwOnError: false })}`;
-  });
 }
 
 function escapeHtml(value: string): string {

@@ -24,7 +24,7 @@ export function extractToc(markdown: string): TocItem[] {
   }, []);
 }
 
-function slugify(value: string): string {
+export function slugify(value: string): string {
   return value
     .toLowerCase()
     .replace(/[^\w\u4e00-\u9fa5\s-]/g, '')
