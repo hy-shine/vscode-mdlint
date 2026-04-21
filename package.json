@@ -1,7 +1,7 @@
 {
   "name": "mdlint",
   "displayName": "MDLint",
-  "description": "Enhanced Markdown preview with multiple themes, table of contents, syntax highlighting, math formulas, and document formatting.",
+  "description": "A lightweight Markdown preview panel.",
   "version": "0.1.0",
   "publisher": "jessy",
   "license": "MIT",

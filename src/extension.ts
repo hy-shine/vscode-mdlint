@@ -64,6 +64,10 @@ export function activate(context: vscode.ExtensionContext): void {
           return;
         }
 
+        if (panel.isSyncingFromPreview()) {
+          return;
+        }
+
         const ranges = event.visibleRanges;
         if (ranges.length === 0) {
           return;

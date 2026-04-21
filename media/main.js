@@ -23,6 +23,8 @@ let currentState = {
 
 let isScrollingFromEditor = false;
 let scrollSyncDebounce = null;
+let suppressScrollSync = false;
+let suppressScrollSyncTimer = null;
 
 // --- Outline popup toggle ---
 outlineTrigger.addEventListener('click', (e) => {
@@ -181,16 +183,26 @@ function renderToc(items) {
       event.preventDefault();
       vscode.postMessage({ type: 'revealLine', value: item.line });
       const target = document.getElementById(item.slug);
-      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      target?.scrollIntoView({ block: 'nearest' });
+      highlightTocItem(item.slug);
+      suppressScrollSync = true;
+      if (suppressScrollSyncTimer) {
+        clearTimeout(suppressScrollSyncTimer);
+      }
+      suppressScrollSyncTimer = setTimeout(() => {
+        suppressScrollSync = false;
+      }, 400);
     });
     tocList.appendChild(link);
   }
 }
 
 contentArea.addEventListener('scroll', () => {
-  updateActiveTocLink();
+  if (!suppressScrollSync) {
+    updateActiveTocLink();
+  }
 
-  if (isScrollingFromEditor) {
+  if (isScrollingFromEditor || suppressScrollSync) {
     return;
   }
 
@@ -199,6 +211,10 @@ contentArea.addEventListener('scroll', () => {
   }
 
   scrollSyncDebounce = setTimeout(() => {
+    if (isScrollingFromEditor || suppressScrollSync) {
+      return;
+    }
+
     const headings = previewContent.querySelectorAll('h1, h2, h3, h4, h5, h6');
     const areaRect = contentArea.getBoundingClientRect();
     let bestHeading = null;
@@ -216,7 +232,7 @@ contentArea.addEventListener('scroll', () => {
     }
 
     if (bestHeading && bestHeading.dataset.sourceLine !== undefined) {
-      vscode.postMessage({ type: 'scrollToLine', value: Number(bestHeading.dataset.sourceLine) });
+      vscode.postMessage({ type: 'syncEditorScroll', value: Number(bestHeading.dataset.sourceLine) });
     }
   }, 80);
 });
@@ -274,15 +290,34 @@ async function renderMermaidDiagrams() {
   }
 }
 
+function highlightTocItem(slug) {
+  const links = tocList.querySelectorAll('.toc-link');
+  for (const link of links) {
+    link.classList.toggle('is-active', link.getAttribute('href') === `#${slug}`);
+  }
+}
+
 function updateActiveTocLink() {
   const headings = previewContent.querySelectorAll('h1, h2, h3, h4, h5, h6');
   const areaRect = contentArea.getBoundingClientRect();
   let activeId = null;
 
+  const isAtBottom = contentArea.scrollHeight - contentArea.scrollTop - contentArea.clientHeight < 40;
+
   for (const heading of headings) {
     const rect = heading.getBoundingClientRect();
     if (rect.top <= areaRect.top + 80) {
       activeId = heading.id;
+    }
+  }
+
+  if (!activeId && isAtBottom) {
+    for (let i = headings.length - 1; i >= 0; i--) {
+      const rect = headings[i].getBoundingClientRect();
+      if (rect.top < areaRect.bottom) {
+        activeId = headings[i].id;
+        break;
+      }
     }
   }
 

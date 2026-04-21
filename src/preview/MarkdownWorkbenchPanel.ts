@@ -10,6 +10,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
   private panel: vscode.WebviewPanel | undefined;
   private sourceUri: vscode.Uri | undefined;
   private readonly disposables: vscode.Disposable[] = [];
+  private isScrollingFromPreview = false;
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -110,6 +111,10 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     this.panel?.dispose();
   }
 
+  public isSyncingFromPreview(): boolean {
+    return this.isScrollingFromPreview;
+  }
+
   private async handleMessage(message: WebviewMessage): Promise<void> {
     switch (message.type) {
       case 'setThemeMode':
@@ -125,23 +130,44 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
         await this.update(undefined);
         return;
       case 'revealLine': {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
+        if (!this.sourceUri) {
           return;
         }
+        const doc = await vscode.workspace.openTextDocument(this.sourceUri);
+        const editor = vscode.window.visibleTextEditors.find(
+          (e) => e.document.uri.toString() === this.sourceUri?.toString(),
+        ) ?? await vscode.window.showTextDocument(doc, { preserveFocus: true, preview: false });
         const position = new vscode.Position(message.value, 0);
         editor.selection = new vscode.Selection(position, position);
         editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
         return;
       }
       case 'scrollToLine': {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
+        if (!this.sourceUri) {
           return;
         }
+        const doc = await vscode.workspace.openTextDocument(this.sourceUri);
+        const editor = vscode.window.visibleTextEditors.find(
+          (e) => e.document.uri.toString() === this.sourceUri?.toString(),
+        ) ?? await vscode.window.showTextDocument(doc, { preserveFocus: true, preview: false });
         const line = Math.min(message.value, editor.document.lineCount - 1);
         const position = new vscode.Position(line, 0);
         editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.Default);
+        return;
+      }
+      case 'syncEditorScroll': {
+        if (!this.sourceUri) {
+          return;
+        }
+        const document = await vscode.workspace.openTextDocument(this.sourceUri);
+        const editor = vscode.window.visibleTextEditors.find(
+          (e) => e.document.uri.toString() === this.sourceUri?.toString(),
+        ) ?? await vscode.window.showTextDocument(document, { preserveFocus: true, preview: false });
+        this.isScrollingFromPreview = true;
+        const line = Math.min(message.value, editor.document.lineCount - 1);
+        const position = new vscode.Position(line, 0);
+        editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+        setTimeout(() => { this.isScrollingFromPreview = false; }, 150);
         return;
       }
       case 'formatDocument':
@@ -204,9 +230,9 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     <div class="app-shell">
       <section class="main-panel">
         <div class="outline-control" id="outline-control">
-          <button class="outline-trigger" id="outline-trigger" type="button" aria-label="Outline" title="Outline">&#9776;</button>
+          <button class="outline-trigger" id="outline-trigger" type="button" aria-label="TOC" title="TOC">&#9776;</button>
           <div class="outline-panel" id="outline-panel">
-            <div class="outline-panel-title">Outline</div>
+            <div class="outline-panel-title">TOC</div>
             <nav id="toc-list" class="toc-list"></nav>
           </div>
         </div>
@@ -291,6 +317,7 @@ type WebviewMessage =
   | { type: 'revealLine'; value: number }
   | { type: 'formatDocument' }
   | { type: 'scrollToLine'; value: number }
+  | { type: 'syncEditorScroll'; value: number }
   | { type: 'exportHtml' };
 
 function getNonce(): string {

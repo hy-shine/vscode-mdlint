@@ -1,8 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <rect x="8" y="16" width="112" height="96" rx="12" fill="#58a6ff" opacity="0.15"/>
-  <rect x="8" y="16" width="112" height="96" rx="12" fill="none" stroke="#58a6ff" stroke-width="4"/>
-  <path d="M28 48 L48 48" stroke="#0969da" stroke-width="6" stroke-linecap="round"/>
-  <path d="M28 64 L80 64" stroke="#0969da" stroke-width="6" stroke-linecap="round"/>
-  <path d="M28 80 L64 80" stroke="#0969da" stroke-width="6" stroke-linecap="round"/>
-  <path d="M88 56 L100 72 L112 56" fill="none" stroke="#0969da" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Background: VS Code dark editor -->
+  <rect x="0" y="0" width="128" height="128" rx="20" fill="#1E1E1E"/>
+
+  <!-- 4 wrapping lines (left & bottom) -->
+  <!-- Line 1: aligned with M midline -->
+  <rect x="16" y="42" width="44" height="5" rx="2.5" fill="#FFFFFF" opacity="0.9"/>
+  <!-- Line 2: aligned with M baseline -->
+  <rect x="16" y="56" width="38" height="5" rx="2.5" fill="#FFFFFF" opacity="0.9"/>
+  <!-- Line 3: extends to M's right edge -->
+  <rect x="16" y="76" width="70" height="5" rx="2.5" fill="#FFFFFF" opacity="0.7"/>
+  <!-- Line 4: bottom wrapping -->
+  <rect x="16" y="90" width="56" height="5" rx="2.5" fill="#FFFFFF" opacity="0.7"/>
+
+  <!-- M character: top-right, VS Code blue -->
+  <text x="94" y="62"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        font-size="48"
+        font-weight="900"
+        fill="#007ACC"
+        text-anchor="middle">M</text>
 </svg>
