@@ -187,9 +187,6 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     const katexStyleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this.context.extensionUri, 'node_modules', 'katex', 'dist', 'katex.min.css'),
     );
-    const hljsStyleUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this.context.extensionUri, 'node_modules', 'highlight.js', 'styles', 'atom-one-dark.css'),
-    );
     const nonce = getNonce();
 
     return `<!DOCTYPE html>
@@ -200,7 +197,6 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="${styleUri}" rel="stylesheet" />
     <link href="${katexStyleUri}" rel="stylesheet" />
-    <link href="${hljsStyleUri}" rel="stylesheet" />
     <title>Markdown Workbench</title>
   </head>
   <body>

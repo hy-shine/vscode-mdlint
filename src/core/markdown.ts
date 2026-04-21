@@ -81,7 +81,10 @@ export function renderMarkdown(markdown: string, toc: TocItem[]): RenderedMarkdo
       return `<pre><code class="language-mermaid">${escapeHtml(text)}</code></pre>`;
     }
     const language = lang && hljs.getLanguage(lang) ? lang : 'plaintext';
-    const highlighted = hljs.highlight(text, { language }).value;
+    let highlighted = hljs.highlight(text, { language }).value;
+    if (language === 'bash' || language === 'sh' || language === 'zsh') {
+      highlighted = annotateShellCommands(highlighted);
+    }
     const copyButton = `<button class="code-copy-button" data-code="${escapeAttribute(text)}" aria-label="Copy code">Copy</button>`;
     return `<pre>${copyButton}<code class="hljs language-${escapeAttribute(language)}">${highlighted}</code></pre>`;
   };
@@ -89,6 +92,43 @@ export function renderMarkdown(markdown: string, toc: TocItem[]): RenderedMarkdo
   return {
     html: marked.parse(markdown, { renderer }) as string,
   };
+}
+
+// Common shell commands not in highlight.js built_in list
+const shellCommands = [
+  'npm', 'npx', 'yarn', 'pnpm', 'bun',
+  'git',
+  'docker', 'docker-compose', 'podman', 'kubectl', 'helm',
+  'curl', 'wget',
+  'pip', 'pip3', 'conda', 'poetry', 'uv',
+  'node', 'python', 'python3', 'ruby', 'java', 'javac', 'go', 'rustc', 'cargo',
+  'make', 'cmake', 'gradle', 'mvn',
+  'grep', 'egrep', 'fgrep', 'rg',
+  'find', 'locate',
+  'awk', 'gawk', 'sed',
+  'more', 'less', 'head', 'tail', 'cat', 'tee',
+  'sort', 'uniq', 'diff', 'patch', 'comm',
+  'tar', 'gzip', 'gunzip', 'zip', 'unzip', 'xz', 'bzip2',
+  'ssh', 'scp', 'rsync', 'sftp',
+  'apt', 'apt-get', 'yum', 'dnf', 'brew', 'pacman',
+  'systemctl', 'service', 'journalctl',
+  'crontab', 'at',
+  'ip', 'ifconfig', 'ping', 'traceroute', 'netstat', 'ss', 'nslookup', 'dig',
+  'gcc', 'g\+\+', 'clang',
+  'vim', 'nano', 'emacs',
+  'man', 'info', 'tldr',
+  'jq', 'yq',
+  'env', 'export', 'source',
+];
+const shellCommandRe = new RegExp(
+  `(?<![\w./-])(?:${shellCommands.join('|')})(?![\w./-])`,
+  'g',
+);
+
+function annotateShellCommands(html: string): string {
+  return html.replace(shellCommandRe, (match) => {
+    return `<span class="hljs-command">${match}</span>`;
+  });
 }
 
 function escapeHtml(value: string): string {

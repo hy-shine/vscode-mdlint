@@ -222,7 +222,21 @@ async function renderMermaidDiagrams() {
 
   const mermaid = await loadMermaid();
   if (!mermaid) {
+    replaceMermaidBlocksWithError(mermaidBlocks, 'Mermaid failed to load');
     return;
+  }
+
+  try {
+    mermaid.initialize(getMermaidConfig());
+  } catch (error) {
+    console.error('Mermaid initialize failed with themed config, falling back.', error);
+    try {
+      mermaid.initialize(getFallbackMermaidConfig());
+    } catch (fallbackError) {
+      console.error('Mermaid fallback initialize failed.', fallbackError);
+      replaceMermaidBlocksWithError(mermaidBlocks, 'Mermaid rendering unavailable');
+      return;
+    }
   }
 
   for (const block of mermaidBlocks) {
@@ -240,9 +254,11 @@ async function renderMermaidDiagrams() {
       const { svg } = await mermaid.render(`mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, source);
       const container = document.createElement('div');
       container.className = 'mermaid-diagram';
+      container.dataset.style = currentState.previewStyle;
       container.innerHTML = svg;
       pre.replaceWith(container);
-    } catch {
+    } catch (error) {
+      console.error('Mermaid render failed.', error);
       const errorDiv = document.createElement('div');
       errorDiv.className = 'mermaid-error';
       errorDiv.textContent = 'Mermaid rendering failed';
@@ -270,6 +286,97 @@ function updateActiveTocLink() {
   }
 }
 
+function getCssVar(name, fallback = '') {
+  const value = getComputedStyle(body).getPropertyValue(name).trim();
+  return value || fallback;
+}
+
+function getMermaidConfig() {
+  const previewStyle = currentState.previewStyle;
+  const fontFamily = getComputedStyle(previewContent).fontFamily || getComputedStyle(body).fontFamily;
+  const background = getCssVar('--bg', '#ffffff');
+  const panel = getCssVar('--panel', '#ffffff');
+  const surfaceSoft = getCssVar('--surface-soft', panel);
+  const border = getCssVar('--border', '#d0d7de');
+  const text = getCssVar('--text', '#1f2328');
+  const muted = getCssVar('--muted', '#59636e');
+  const accent = getCssVar('--accent', '#0969da');
+
+  const themeVariables = {
+    background,
+    fontFamily,
+    fontSize: previewStyle === 'notion' ? '15px' : '14px',
+    primaryColor: previewStyle === 'notion' ? surfaceSoft : panel,
+    primaryTextColor: text,
+    primaryBorderColor: border,
+    lineColor: accent,
+    secondaryColor: surfaceSoft,
+    secondaryTextColor: text,
+    secondaryBorderColor: border,
+    tertiaryColor: background,
+    tertiaryTextColor: text,
+    tertiaryBorderColor: border,
+    mainBkg: panel,
+    secondBkg: surfaceSoft,
+    tertiaryBkg: background,
+    clusterBkg: surfaceSoft,
+    clusterBorder: border,
+    edgeLabelBackground: background,
+    actorBkg: panel,
+    actorBorder: border,
+    actorTextColor: text,
+    noteBkgColor: surfaceSoft,
+    noteTextColor: text,
+    noteBorderColor: border,
+    signalColor: accent,
+    signalTextColor: muted,
+    labelBoxBkgColor: background,
+    labelBoxBorderColor: border,
+    labelTextColor: text,
+  };
+
+  return {
+    startOnLoad: false,
+    securityLevel: 'loose',
+    theme: 'base',
+    themeVariables,
+    flowchart: {
+      curve: previewStyle === 'notion' ? 'basis' : 'linear',
+      htmlLabels: true,
+    },
+    sequence: {
+      diagramMarginX: 24,
+      diagramMarginY: 18,
+      actorMargin: 32,
+    },
+  };
+}
+
+function getFallbackMermaidConfig() {
+  const isDark = body.classList.contains('theme-dark') || (body.classList.contains('theme-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  return {
+    startOnLoad: false,
+    securityLevel: 'loose',
+    theme: isDark ? 'dark' : 'default',
+    flowchart: {
+      htmlLabels: true,
+    },
+  };
+}
+
+function replaceMermaidBlocksWithError(blocks, message) {
+  for (const block of blocks) {
+    const pre = block.parentElement;
+    if (!pre) {
+      continue;
+    }
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'mermaid-error';
+    errorDiv.textContent = message;
+    pre.replaceWith(errorDiv);
+  }
+}
+
 async function loadMermaid() {
   if (window.mermaid) {
     return window.mermaid;
@@ -280,7 +387,6 @@ async function loadMermaid() {
     script.src = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';
     script.onload = () => {
       if (window.mermaid) {
-        window.mermaid.initialize({ startOnLoad: false, theme: 'default' });
         resolve(window.mermaid);
       } else {
         resolve(null);
