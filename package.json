@@ -71,9 +71,9 @@
         },
         "mdlint.previewStyle": {
           "type": "string",
-          "enum": ["default", "github", "notion", "tokyo-night", "obsidian"],
+          "enum": ["default", "github", "notion", "tokyo-night", "obsidian", "paper"],
           "default": "default",
-          "description": "Preview style preset for the MDLint preview. Options: default, github, notion, tokyo-night, obsidian."
+          "description": "Preview style preset for the MDLint preview. Options: default, github, notion, tokyo-night, obsidian, paper."
         },
         "mdlint.showToc": {
           "type": "boolean",

@@ -150,7 +150,7 @@ window.addEventListener('message', (event) => {
 
 function setBodyPresentation(themeMode, previewStyle) {
   body.classList.remove('theme-auto', 'theme-light', 'theme-dark');
-  body.classList.remove('style-default', 'style-github', 'style-notion', 'style-tokyo-night', 'style-obsidian');
+  body.classList.remove('style-default', 'style-github', 'style-notion', 'style-tokyo-night', 'style-obsidian', 'style-paper');
   body.classList.add(`theme-${themeMode}`);
   body.classList.add(`style-${previewStyle}`);
 }
@@ -341,13 +341,19 @@ function isPreviewDarkAppearance() {
   return body.classList.contains('theme-dark') || (body.classList.contains('theme-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
 }
 
+function isPaperStyle() {
+  return body.classList.contains('style-paper');
+}
+
 function getMermaidDesignTokens() {
   const fontFamily = getComputedStyle(previewContent).fontFamily || getComputedStyle(body).fontFamily;
   const isDark = isPreviewDarkAppearance();
+  const isPaper = isPaperStyle();
 
   // Hardcoded palette for guaranteed readability.
   // Dark mode: deep gray background, light gray nodes, bright text.
   // Light mode: off-white background, white nodes, dark text.
+  // Paper mode: even flatter, no shadows, tighter geometry.
   if (isDark) {
     return {
       fontFamily,
@@ -410,7 +416,17 @@ function getMermaidDesignTokens() {
 }
 
 function applyMermaidDesignTokens(container) {
-  const design = getMermaidDesignTokens();
+  let design = getMermaidDesignTokens();
+  if (isPaperStyle()) {
+    design = {
+      ...design,
+      nodeRadius: 3,
+      clusterRadius: 4,
+      lineWidth: 1.0,
+      shellShadow: 'none',
+      shellHoverShadow: 'none',
+    };
+  }
   const variables = {
     '--mdlint-mermaid-bg': design.background,
     '--mdlint-mermaid-node-bg': design.nodeFill,
@@ -515,10 +531,13 @@ function enhanceMermaidSvg(container, source) {
   addClassToAll(svg, '.edgeLabel foreignObject div, .edgeLabel foreignObject span, .edgeLabel foreignObject p, .cluster-label foreignObject div, .cluster-label foreignObject span, .cluster-label foreignObject p', 'mdlint-mermaid-badge');
 
   const design = getMermaidDesignTokens();
-  roundSvgRects(svg, '.node rect', design.nodeRadius);
-  roundSvgRects(svg, '.cluster rect', design.clusterRadius);
+  const isPaper = isPaperStyle();
+  const nodeRadius = isPaper ? 3 : design.nodeRadius;
+  const clusterRadius = isPaper ? 4 : design.clusterRadius;
+  roundSvgRects(svg, '.node rect', nodeRadius);
+  roundSvgRects(svg, '.cluster rect', clusterRadius);
   roundSvgRects(svg, '.edgeLabel rect, .labelBkg', 999);
-  roundSvgRects(svg, '.actor rect, .classBox rect, .note rect', Math.max(4, design.nodeRadius - 2));
+  roundSvgRects(svg, '.actor rect, .classBox rect, .note rect', Math.max(4, nodeRadius - 2));
 }
 
 function getMermaidConfig() {
@@ -642,6 +661,11 @@ function replaceMermaidBlocksWithError(blocks, message) {
   }
 }
 
+const SVG_ZOOM_IN  = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>';
+const SVG_ZOOM_OUT = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="8" x2="13" y2="8"/></svg>';
+const SVG_RESET    = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5A5.5 5.5 0 1 1 3.5 10"/><polyline points="2.5 2.5 2.5 6.5 6.5 6.5"/></svg>';
+const SVG_CLOSE    = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>';
+
 function setupMermaidInteraction(container) {
   let scale = 1;
   let panX = 0;
@@ -673,7 +697,7 @@ function setupMermaidInteraction(container) {
 
     const btnIn = document.createElement('button');
     btnIn.className = 'mermaid-zoom-btn mermaid-zoom-in';
-    btnIn.textContent = '+';
+    btnIn.innerHTML = SVG_ZOOM_IN;
     btnIn.setAttribute('aria-label', 'Zoom in');
     btnIn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -682,7 +706,7 @@ function setupMermaidInteraction(container) {
 
     const btnOut = document.createElement('button');
     btnOut.className = 'mermaid-zoom-btn mermaid-zoom-out';
-    btnOut.textContent = '−';
+    btnOut.innerHTML = SVG_ZOOM_OUT;
     btnOut.setAttribute('aria-label', 'Zoom out');
     btnOut.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -691,7 +715,7 @@ function setupMermaidInteraction(container) {
 
     const btnReset = document.createElement('button');
     btnReset.className = 'mermaid-zoom-btn mermaid-zoom-reset';
-    btnReset.textContent = '↺';
+    btnReset.innerHTML = SVG_RESET;
     btnReset.setAttribute('aria-label', 'Reset zoom');
     btnReset.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -759,7 +783,7 @@ function openMermaidFullscreen(container) {
   clone.classList.add('mermaid-fullscreen-content');
   const closeBtn = document.createElement('button');
   closeBtn.className = 'mermaid-fullscreen-close';
-  closeBtn.textContent = '✕';
+  closeBtn.innerHTML = SVG_CLOSE;
   closeBtn.setAttribute('aria-label', 'Close fullscreen');
   closeBtn.addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', (e) => {

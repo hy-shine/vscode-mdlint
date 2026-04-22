@@ -296,6 +296,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
               <button class="floating-menu-item" data-value="notion">Notion</button>
               <button class="floating-menu-item" data-value="tokyo-night">Tokyo Night</button>
               <button class="floating-menu-item" data-value="obsidian">Obsidian</button>
+              <button class="floating-menu-item" data-value="paper">Paper</button>
             </div>
             <div class="floating-menu-divider"></div>
             <div class="floating-menu-section-label">Actions</div>
