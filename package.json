@@ -1,14 +1,19 @@
 {
   "name": "mdlint",
   "displayName": "MDLint",
-  "description": "A lightweight Markdown preview panel.",
+  "description": "Enhanced Markdown preview with multiple themes, table of contents, math formulas, code highlighting, and export capabilities.",
   "version": "0.1.0",
   "publisher": "jessy",
   "license": "MIT",
+  "author": "jessy",
   "repository": {
     "type": "git",
     "url": "https://github.com/hy-shine/vscode-mdlint"
   },
+  "bugs": {
+    "url": "https://github.com/hy-shine/vscode-mdlint/issues"
+  },
+  "homepage": "https://github.com/hy-shine/vscode-mdlint#readme",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -17,7 +22,9 @@
     "Markdown"
   ],
   "keywords": [
-    "markdown"
+    "markdown",
+    "preview",
+    "toc"
   ],
   "icon": "images/icon.png",
   "main": "./dist/extension.js",

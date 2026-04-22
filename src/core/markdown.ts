@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import hljs from 'highlight.js';
 import katex from 'katex';
 import { marked, TokenizerAndRendererExtension, Tokens } from 'marked';
@@ -64,7 +65,12 @@ marked.setOptions({
   breaks: false,
 });
 
-export function renderMarkdown(markdown: string, toc: TocItem[]): RenderedMarkdown {
+export function renderMarkdown(
+  markdown: string,
+  toc: TocItem[],
+  baseUri?: vscode.Uri,
+  resolveImageUri?: (uri: vscode.Uri) => vscode.Uri,
+): RenderedMarkdown {
   const headings = new Map(toc.map((item) => [item.text, item.slug]));
   const lineToSlug = new Map(toc.map((item) => [item.line, item.slug]));
 
@@ -87,6 +93,15 @@ export function renderMarkdown(markdown: string, toc: TocItem[]): RenderedMarkdo
     }
     const copyButton = `<button class="code-copy-button" data-code="${escapeAttribute(text)}" aria-label="Copy code">Copy</button>`;
     return `<pre>${copyButton}<code class="hljs language-${escapeAttribute(language)}">${highlighted}</code></pre>`;
+  };
+  renderer.image = ({ href, title, text }: Tokens.Image) => {
+    let src = href;
+    if (!/^(https?:|data:|#)/i.test(src) && baseUri) {
+      const imageUri = vscode.Uri.joinPath(baseUri, src);
+      src = resolveImageUri ? resolveImageUri(imageUri).toString() : imageUri.toString();
+    }
+    const titleAttr = title ? ` title="${escapeAttribute(title)}"` : '';
+    return `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(text)}"${titleAttr}>`;
   };
 
   return {

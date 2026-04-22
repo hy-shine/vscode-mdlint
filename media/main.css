@@ -45,6 +45,55 @@ body.theme-dark {
   --surface-soft: #11161d !important;
 }
 
+body.theme-auto {
+  --bg: var(--vscode-editor-background);
+  --panel: var(--vscode-sideBar-background);
+  --toolbar: color-mix(in srgb, var(--bg) 82%, white 18%);
+  --border: var(--vscode-panel-border, rgba(128, 128, 128, 0.3));
+  --text: var(--vscode-editor-foreground);
+  --muted: var(--vscode-descriptionForeground);
+  --accent: var(--vscode-textLink-foreground);
+  --code-bg: color-mix(in srgb, var(--bg) 88%, black 12%);
+  --code-border: color-mix(in srgb, var(--border) 76%, transparent);
+  --inline-code-bg: color-mix(in srgb, var(--code-bg) 88%, var(--panel) 12%);
+  --inline-code-text: var(--text);
+  --surface-soft: color-mix(in srgb, var(--panel) 70%, var(--bg) 30%);
+}
+
+@media (prefers-color-scheme: light) {
+  body.theme-auto {
+    --bg: #f6f8fa !important;
+    --panel: #ffffff !important;
+    --toolbar: #ffffff !important;
+    --border: rgba(31, 35, 40, 0.12) !important;
+    --text: #1f2328 !important;
+    --muted: #59636e !important;
+    --accent: #0969da !important;
+    --code-bg: #eef2f6 !important;
+    --code-border: rgba(31, 35, 40, 0.08) !important;
+    --inline-code-bg: #f3f4f6 !important;
+    --inline-code-text: #cf222e !important;
+    --surface-soft: #f8fafc !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body.theme-auto {
+    --bg: #0d1117 !important;
+    --panel: #161b22 !important;
+    --toolbar: #161b22 !important;
+    --border: rgba(240, 246, 252, 0.12) !important;
+    --text: #e6edf3 !important;
+    --muted: #8b949e !important;
+    --accent: #58a6ff !important;
+    --code-bg: #11161d !important;
+    --code-border: rgba(240, 246, 252, 0.08) !important;
+    --inline-code-bg: #1f2630 !important;
+    --inline-code-text: #ff7b72 !important;
+    --surface-soft: #11161d !important;
+  }
+}
+
 body {
   margin: 0;
   overflow: hidden;
@@ -78,6 +127,7 @@ select {
   overflow: auto;
   position: relative;
   scroll-padding-top: calc(var(--preview-top-inset) + 8px);
+  contain: layout;
 }
 
 .preview-content {
@@ -86,6 +136,18 @@ select {
   padding: var(--preview-top-inset) 0 64px;
   line-height: 1.7;
   font-size: 15px;
+  overflow-wrap: break-word;
+}
+
+.preview-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.preview-content table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .preview-content h1,
@@ -348,6 +410,78 @@ body.theme-light .hljs-variable.language {
   color: #e45649;
 }
 
+/* ===== hljs: auto mode (light system preference) ===== */
+@media (prefers-color-scheme: light) {
+  body.theme-auto .hljs {
+    color: #383a42;
+  }
+  body.theme-auto .hljs-comment,
+  body.theme-auto .hljs-quote {
+    color: #a0a1a7;
+  }
+  body.theme-auto .hljs-doctag,
+  body.theme-auto .hljs-keyword,
+  body.theme-auto .hljs-formula {
+    color: #a626a4;
+  }
+  body.theme-auto .hljs-section,
+  body.theme-auto .hljs-name,
+  body.theme-auto .hljs-selector-tag,
+  body.theme-auto .hljs-deletion,
+  body.theme-auto .hljs-subst {
+    color: #e45649;
+  }
+  body.theme-auto .hljs-literal {
+    color: #0184bb;
+  }
+  body.theme-auto .hljs-string,
+  body.theme-auto .hljs-regexp,
+  body.theme-auto .hljs-addition,
+  body.theme-auto .hljs-attribute,
+  body.theme-auto .hljs-meta .hljs-string {
+    color: #50a14f;
+  }
+  body.theme-auto .hljs-attr,
+  body.theme-auto .hljs-variable,
+  body.theme-auto .hljs-template-variable,
+  body.theme-auto .hljs-type,
+  body.theme-auto .hljs-selector-class,
+  body.theme-auto .hljs-selector-attr,
+  body.theme-auto .hljs-selector-pseudo,
+  body.theme-auto .hljs-number {
+    color: #986801;
+  }
+  body.theme-auto .hljs-symbol,
+  body.theme-auto .hljs-bullet,
+  body.theme-auto .hljs-link,
+  body.theme-auto .hljs-meta,
+  body.theme-auto .hljs-selector-id,
+  body.theme-auto .hljs-title {
+    color: #4078f2;
+  }
+  body.theme-auto .hljs-built_in,
+  body.theme-auto .hljs-title.class_,
+  body.theme-auto .hljs-class .hljs-title {
+    color: #c18401;
+  }
+  body.theme-auto .hljs-function,
+  body.theme-auto .hljs-function .hljs-title {
+    color: #4078f2;
+  }
+  body.theme-auto .hljs-function .hljs-params {
+    color: #383a42;
+  }
+  body.theme-auto .hljs-title.function {
+    color: #4078f2;
+  }
+  body.theme-auto .hljs-operator {
+    color: #0184bb;
+  }
+  body.theme-auto .hljs-variable.language {
+    color: #e45649;
+  }
+}
+
 .preview-content blockquote {
   margin: 1.2em 0;
   padding-left: 1em;
@@ -359,6 +493,9 @@ body.theme-light .hljs-variable.language {
   width: 100%;
   border-collapse: collapse;
   margin: 1rem 0;
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .preview-content th,
@@ -382,25 +519,103 @@ body.theme-light .hljs-variable.language {
   display: block;
 }
 
+/* ---- Mermaid Diagram: Minimal, Clean, Readable ---- */
+
 .mermaid-diagram {
-  margin: 1rem 0;
+  margin: 1.2rem 0;
   text-align: center;
   overflow-x: auto;
-  padding: 18px;
-  border-radius: 16px;
-  border: 1px solid var(--code-border);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-soft) 88%, transparent), color-mix(in srgb, var(--code-bg) 82%, transparent));
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--mdlint-mermaid-border, #dadce0);
+  background: var(--mdlint-mermaid-bg, #f8f9fa);
+  box-shadow: var(--mdlint-mermaid-shell-shadow, 0 1px 2px rgba(60,64,67,0.08));
+  position: relative;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.mermaid-diagram:hover {
+  border-color: var(--mdlint-mermaid-border-strong, #9aa0a6);
+  box-shadow: var(--mdlint-mermaid-shell-hover-shadow, 0 1px 3px rgba(60,64,67,0.14));
+}
+
+.mermaid-diagram:hover .mermaid-zoom-controls {
+  opacity: 1;
+}
+
+.mermaid-zoom-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 5;
+}
+
+.mermaid-zoom-btn {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--mdlint-mermaid-border, #dadce0);
+  border-radius: 6px;
+  background: var(--mdlint-mermaid-node-bg, #ffffff);
+  color: var(--mdlint-mermaid-text, #202124);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+.mermaid-zoom-btn:hover {
+  border-color: var(--mdlint-mermaid-border-strong, #9aa0a6);
+  background: var(--mdlint-mermaid-node-bg-alt, #f1f3f4);
+}
+
+.mermaid-zoom-btn:active {
+  transform: scale(0.92);
 }
 
 .mermaid-diagram svg {
   max-width: 100%;
   height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
+.mermaid-diagram svg foreignObject {
+  overflow: visible;
+}
+
+/* Font override for all SVG text */
 .mermaid-diagram svg text,
-.mermaid-diagram svg tspan {
-  font-family: var(--vscode-font-family, Inter, system-ui, sans-serif) !important;
+.mermaid-diagram svg tspan,
+.mermaid-diagram svg foreignObject div,
+.mermaid-diagram svg foreignObject span {
+  font-family: var(--vscode-font-family, 'Segoe UI', system-ui, sans-serif) !important;
+}
+
+/* Node text */
+.mermaid-diagram svg .node .label {
+  color: var(--mdlint-mermaid-text, #202124) !important;
+}
+
+/* Edge label pills */
+.mermaid-diagram svg .edgeLabel {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Edge label text */
+.mermaid-diagram svg .edgeLabel .label {
+  color: var(--mdlint-mermaid-text-soft, #5f6368) !important;
 }
 
 .mermaid-error {
@@ -411,6 +626,67 @@ body.theme-light .hljs-variable.language {
   color: #e5534b;
   background: rgba(229, 83, 75, 0.08);
   font-size: 14px;
+}
+
+.mermaid-error-detail {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-family: monospace;
+  opacity: 0.85;
+  word-break: break-word;
+}
+
+.mermaid-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: mermaid-fade-in 0.2s ease;
+}
+
+@keyframes mermaid-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mermaid-fullscreen-content {
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow: auto;
+  padding: 24px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--accent) 9%, transparent), transparent 52%),
+    linear-gradient(180deg, color-mix(in srgb, var(--panel) 94%, var(--bg) 6%), color-mix(in srgb, var(--bg) 90%, var(--panel) 10%));
+  border: 1px solid var(--mdlint-mermaid-node-border-strong, var(--border));
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.mermaid-fullscreen-close {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 1001;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.mermaid-fullscreen-close:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* ===== Outline Control (top-right fixed) ===== */
@@ -971,6 +1247,17 @@ body.style-tokyo-night .preview-content img {
   border: 1px solid var(--border);
 }
 
+body.style-tokyo-night .mermaid-diagram {
+  border-radius: 12px;
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--border));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 90%, var(--accent) 4%), color-mix(in srgb, var(--code-bg) 85%, transparent));
+  box-shadow: 0 8px 32px rgba(122, 162, 247, 0.06), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.style-tokyo-night .mermaid-diagram:hover {
+  box-shadow: 0 8px 32px rgba(122, 162, 247, 0.12), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 /* ===== Obsidian ===== */
 body.style-obsidian {
   --bg: #1e1e1e !important;
@@ -1108,6 +1395,17 @@ body.style-obsidian .preview-content th {
 
 body.style-obsidian .preview-content tr:nth-child(2n) td {
   background: color-mix(in srgb, var(--bg) 60%, var(--panel));
+}
+
+body.style-obsidian .mermaid-diagram {
+  border-radius: 8px;
+  border-color: color-mix(in srgb, var(--accent) 15%, var(--border));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, var(--accent) 3%), color-mix(in srgb, var(--code-bg) 85%, transparent));
+  box-shadow: 0 6px 24px rgba(123, 104, 238, 0.05), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.style-obsidian .mermaid-diagram:hover {
+  box-shadow: 0 6px 24px rgba(123, 104, 238, 0.1), 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* ===== Floating Controls ===== */

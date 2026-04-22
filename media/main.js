@@ -279,12 +279,16 @@ async function renderMermaidDiagrams() {
       container.className = 'mermaid-diagram';
       container.dataset.style = currentState.previewStyle;
       container.innerHTML = svg;
+      applyMermaidDesignTokens(container);
+      enhanceMermaidSvg(container, source);
       pre.replaceWith(container);
+      setupMermaidInteraction(container);
     } catch (error) {
       console.error('Mermaid render failed.', error);
       const errorDiv = document.createElement('div');
       errorDiv.className = 'mermaid-error';
-      errorDiv.textContent = 'Mermaid rendering failed';
+      const msg = error?.message || error?.str || String(error);
+      errorDiv.innerHTML = `<strong>Mermaid rendering failed</strong><br><span class="mermaid-error-detail">${escapeMermaidHtml(msg)}</span>`;
       pre.replaceWith(errorDiv);
     }
   }
@@ -333,48 +337,254 @@ function getCssVar(name, fallback = '') {
   return value || fallback;
 }
 
-function getMermaidConfig() {
-  const previewStyle = currentState.previewStyle;
-  const fontFamily = getComputedStyle(previewContent).fontFamily || getComputedStyle(body).fontFamily;
-  const background = getCssVar('--bg', '#ffffff');
-  const panel = getCssVar('--panel', '#ffffff');
-  const surfaceSoft = getCssVar('--surface-soft', panel);
-  const border = getCssVar('--border', '#d0d7de');
-  const text = getCssVar('--text', '#1f2328');
-  const muted = getCssVar('--muted', '#59636e');
-  const accent = getCssVar('--accent', '#0969da');
+function isPreviewDarkAppearance() {
+  return body.classList.contains('theme-dark') || (body.classList.contains('theme-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
 
-  const themeVariables = {
-    background,
+function getMermaidDesignTokens() {
+  const fontFamily = getComputedStyle(previewContent).fontFamily || getComputedStyle(body).fontFamily;
+  const isDark = isPreviewDarkAppearance();
+
+  // Hardcoded palette for guaranteed readability.
+  // Dark mode: deep gray background, light gray nodes, bright text.
+  // Light mode: off-white background, white nodes, dark text.
+  if (isDark) {
+    return {
+      fontFamily,
+      isDark: true,
+      curve: 'basis',
+      nodeRadius: 8,
+      clusterRadius: 12,
+      lineWidth: 1.2,
+      // Surfaces
+      background: '#1e1e1e',
+      nodeFill: '#2a2d33',
+      nodeFillAlt: '#32353c',
+      clusterFill: '#25282e',
+      labelFill: '#1e1e1e',
+      noteFill: '#2a2d33',
+      // Text (guaranteed bright)
+      text: '#e8eaed',
+      textSoft: '#9aa0a6',
+      textOnAccent: '#1e1e1e',
+      // Lines
+      edge: '#5f6368',
+      edgeActive: '#8ab4f8',
+      // Borders
+      border: '#3c4043',
+      borderStrong: '#5f6368',
+      // Shadows (minimal)
+      shellShadow: '0 1px 3px rgba(0,0,0,0.24)',
+      shellHoverShadow: '0 2px 6px rgba(0,0,0,0.32)',
+    };
+  }
+
+  return {
     fontFamily,
-    fontSize: previewStyle === 'notion' ? '15px' : '14px',
-    primaryColor: previewStyle === 'notion' ? surfaceSoft : panel,
-    primaryTextColor: text,
-    primaryBorderColor: border,
-    lineColor: accent,
-    secondaryColor: surfaceSoft,
-    secondaryTextColor: text,
-    secondaryBorderColor: border,
-    tertiaryColor: background,
-    tertiaryTextColor: text,
-    tertiaryBorderColor: border,
-    mainBkg: panel,
-    secondBkg: surfaceSoft,
-    tertiaryBkg: background,
-    clusterBkg: surfaceSoft,
-    clusterBorder: border,
-    edgeLabelBackground: background,
-    actorBkg: panel,
-    actorBorder: border,
-    actorTextColor: text,
-    noteBkgColor: surfaceSoft,
-    noteTextColor: text,
-    noteBorderColor: border,
-    signalColor: accent,
-    signalTextColor: muted,
-    labelBoxBkgColor: background,
-    labelBoxBorderColor: border,
-    labelTextColor: text,
+    isDark: false,
+    curve: 'basis',
+    nodeRadius: 8,
+    clusterRadius: 12,
+    lineWidth: 1.2,
+    // Surfaces
+    background: '#f8f9fa',
+    nodeFill: '#ffffff',
+    nodeFillAlt: '#f1f3f4',
+    clusterFill: '#f1f3f4',
+    labelFill: '#f8f9fa',
+    noteFill: '#ffffff',
+    // Text (guaranteed dark)
+    text: '#202124',
+    textSoft: '#5f6368',
+    textOnAccent: '#ffffff',
+    // Lines
+    edge: '#dadce0',
+    edgeActive: '#1a73e8',
+    // Borders
+    border: '#dadce0',
+    borderStrong: '#9aa0a6',
+    // Shadows (minimal)
+    shellShadow: '0 1px 2px rgba(60,64,67,0.08)',
+    shellHoverShadow: '0 1px 3px rgba(60,64,67,0.14)',
+  };
+}
+
+function applyMermaidDesignTokens(container) {
+  const design = getMermaidDesignTokens();
+  const variables = {
+    '--mdlint-mermaid-bg': design.background,
+    '--mdlint-mermaid-node-bg': design.nodeFill,
+    '--mdlint-mermaid-node-bg-alt': design.nodeFillAlt,
+    '--mdlint-mermaid-cluster-bg': design.clusterFill,
+    '--mdlint-mermaid-label-bg': design.labelFill,
+    '--mdlint-mermaid-note-bg': design.noteFill,
+    '--mdlint-mermaid-text': design.text,
+    '--mdlint-mermaid-text-soft': design.textSoft,
+    '--mdlint-mermaid-edge': design.edge,
+    '--mdlint-mermaid-edge-active': design.edgeActive,
+    '--mdlint-mermaid-border': design.border,
+    '--mdlint-mermaid-border-strong': design.borderStrong,
+    '--mdlint-mermaid-shell-shadow': design.shellShadow,
+    '--mdlint-mermaid-shell-hover-shadow': design.shellHoverShadow,
+    '--mdlint-mermaid-node-radius': `${design.nodeRadius}px`,
+    '--mdlint-mermaid-cluster-radius': `${design.clusterRadius}px`,
+    '--mdlint-mermaid-line-width': `${design.lineWidth}px`,
+  };
+
+  for (const [name, value] of Object.entries(variables)) {
+    container.style.setProperty(name, value);
+  }
+}
+
+function addClassToAll(root, selector, className) {
+  for (const element of root.querySelectorAll(selector)) {
+    element.classList.add(className);
+  }
+}
+
+function roundSvgRects(root, selector, radius) {
+  for (const rect of root.querySelectorAll(selector)) {
+    rect.setAttribute('rx', String(radius));
+    rect.setAttribute('ry', String(radius));
+  }
+}
+
+function detectMermaidDiagramType(source) {
+  const normalized = source.trim();
+  if (normalized.startsWith('sequenceDiagram')) {
+    return 'sequence';
+  }
+  if (normalized.startsWith('classDiagram')) {
+    return 'class';
+  }
+  if (normalized.startsWith('stateDiagram')) {
+    return 'state';
+  }
+  if (normalized.startsWith('erDiagram')) {
+    return 'er';
+  }
+  if (normalized.startsWith('journey')) {
+    return 'journey';
+  }
+  if (normalized.startsWith('gantt')) {
+    return 'gantt';
+  }
+  if (normalized.startsWith('pie')) {
+    return 'pie';
+  }
+  if (normalized.startsWith('mindmap')) {
+    return 'mindmap';
+  }
+  if (normalized.startsWith('timeline')) {
+    return 'timeline';
+  }
+  return 'flowchart';
+}
+
+function enhanceMermaidSvg(container, source) {
+  const svg = container.querySelector('svg');
+  if (!svg) {
+    return;
+  }
+
+  const diagramType = detectMermaidDiagramType(source);
+  container.dataset.diagramType = diagramType;
+  svg.classList.add('mdlint-mermaid-svg');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMin meet');
+  svg.setAttribute('role', 'img');
+  svg.dataset.diagramType = diagramType;
+
+  const title = svg.querySelector('title');
+  if (title?.textContent) {
+    svg.setAttribute('aria-label', title.textContent.trim());
+  }
+
+  addClassToAll(svg, '.node', 'mdlint-mermaid-node');
+  addClassToAll(svg, '.node rect, .node polygon, .node circle, .node ellipse, .node path', 'mdlint-mermaid-node-shape');
+  addClassToAll(svg, '.cluster', 'mdlint-mermaid-cluster');
+  addClassToAll(svg, '.cluster rect', 'mdlint-mermaid-cluster-shape');
+  addClassToAll(svg, '.edgePath .path, .flowchart-link, path.relation, path.messageLine0, path.messageLine1, .transition', 'mdlint-mermaid-edge-path');
+  addClassToAll(svg, 'marker path', 'mdlint-mermaid-arrow');
+  addClassToAll(svg, '.edgeLabel', 'mdlint-mermaid-edge-label');
+  addClassToAll(svg, '.edgeLabel rect, .labelBkg', 'mdlint-mermaid-label-bg');
+  addClassToAll(svg, '.note rect, .note path', 'mdlint-mermaid-note-shape');
+  addClassToAll(svg, '.actor rect, .actor path', 'mdlint-mermaid-actor-shape');
+  addClassToAll(svg, '.classBox rect, .classBox path', 'mdlint-mermaid-class-shape');
+  addClassToAll(svg, 'text, tspan', 'mdlint-mermaid-text');
+  addClassToAll(svg, '.nodeLabel, .node foreignObject div, .node foreignObject span, .node foreignObject p', 'mdlint-mermaid-node-label');
+  addClassToAll(svg, '.edgeLabel foreignObject div, .edgeLabel foreignObject span, .edgeLabel foreignObject p, .cluster-label foreignObject div, .cluster-label foreignObject span, .cluster-label foreignObject p', 'mdlint-mermaid-badge');
+
+  const design = getMermaidDesignTokens();
+  roundSvgRects(svg, '.node rect', design.nodeRadius);
+  roundSvgRects(svg, '.cluster rect', design.clusterRadius);
+  roundSvgRects(svg, '.edgeLabel rect, .labelBkg', 999);
+  roundSvgRects(svg, '.actor rect, .classBox rect, .note rect', Math.max(4, design.nodeRadius - 2));
+}
+
+function getMermaidConfig() {
+  const design = getMermaidDesignTokens();
+
+  // Use 'base' theme with hardcoded hex values for guaranteed readability.
+  const themeVariables = {
+    background: design.background,
+    fontFamily: design.fontFamily,
+    fontSize: '14px',
+    // Nodes (primary)
+    primaryColor: design.nodeFill,
+    primaryTextColor: design.text,
+    primaryBorderColor: design.borderStrong,
+    // Nodes (secondary)
+    secondaryColor: design.nodeFillAlt,
+    secondaryTextColor: design.text,
+    secondaryBorderColor: design.border,
+    // Background level
+    tertiaryColor: design.background,
+    tertiaryTextColor: design.text,
+    tertiaryBorderColor: design.border,
+    // Lines
+    lineColor: design.edge,
+    // Clusters
+    clusterBkg: design.clusterFill,
+    clusterBorder: design.border,
+    // Edge labels
+    edgeLabelBackground: design.labelFill,
+    edgeLabelText: design.text,
+    // Sequence diagram
+    actorBkg: design.nodeFillAlt,
+    actorBorder: design.border,
+    actorTextColor: design.text,
+    actorLineColor: design.border,
+    signalColor: design.edge,
+    signalTextColor: design.textSoft,
+    // Notes
+    noteBkgColor: design.noteFill,
+    noteTextColor: design.text,
+    noteBorderColor: design.borderStrong,
+    // Labels
+    labelBoxBkgColor: design.labelFill,
+    labelBoxBorderColor: design.border,
+    labelTextColor: design.text,
+    // Rounding
+    nodeBorderRadius: design.nodeRadius,
+    // Class diagram
+    classText: design.text,
+    classColor: design.nodeFill,
+    classBorder: design.border,
+    // Gantt
+    taskBkgColor: design.nodeFillAlt,
+    taskTextColor: design.text,
+    activeTaskBkgColor: design.edgeActive,
+    activeTaskTextColor: design.text,
+    gridColor: design.border,
+    todayLineColor: design.edgeActive,
+    // Pie
+    pie1: design.edgeActive,
+    pie2: design.borderStrong,
+    pie3: design.nodeFillAlt,
+    pie4: design.noteFill,
+    pie5: design.clusterFill,
+    pie6: design.text,
+    pie7: design.labelFill,
   };
 
   return {
@@ -383,19 +593,32 @@ function getMermaidConfig() {
     theme: 'base',
     themeVariables,
     flowchart: {
-      curve: previewStyle === 'notion' ? 'basis' : 'linear',
+      curve: design.curve,
       htmlLabels: true,
+      nodeSpacing: 28,
+      rankSpacing: 40,
+      padding: 14,
     },
     sequence: {
-      diagramMarginX: 24,
-      diagramMarginY: 18,
-      actorMargin: 32,
+      diagramMarginX: 28,
+      diagramMarginY: 20,
+      actorMargin: 36,
+      messageMargin: 24,
+    },
+    gantt: {
+      leftPadding: 84,
+      topPadding: 36,
+      barHeight: 28,
+    },
+    journey: {
+      diagramMarginX: 28,
+      diagramMarginY: 20,
     },
   };
 }
 
 function getFallbackMermaidConfig() {
-  const isDark = body.classList.contains('theme-dark') || (body.classList.contains('theme-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const isDark = isPreviewDarkAppearance();
   return {
     startOnLoad: false,
     securityLevel: 'loose',
@@ -417,6 +640,146 @@ function replaceMermaidBlocksWithError(blocks, message) {
     errorDiv.textContent = message;
     pre.replaceWith(errorDiv);
   }
+}
+
+function setupMermaidInteraction(container) {
+  let scale = 1;
+  let panX = 0;
+  let panY = 0;
+  let isPanning = false;
+  let hasDragged = false;
+  let startX = 0;
+  let startY = 0;
+  const svg = container.querySelector('svg');
+  if (!svg) { return; }
+
+  svg.style.cursor = 'grab';
+  svg.style.transformOrigin = 'center center';
+  svg.style.transition = 'transform 0.15s ease';
+
+  function applyTransform() {
+    svg.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+  }
+
+  function zoomTo(newScale) {
+    scale = Math.min(Math.max(newScale, 0.3), 5);
+    applyTransform();
+  }
+
+  // Zoom controls (top-right +/− buttons)
+  if (!container.querySelector('.mermaid-zoom-controls')) {
+    const controls = document.createElement('div');
+    controls.className = 'mermaid-zoom-controls';
+
+    const btnIn = document.createElement('button');
+    btnIn.className = 'mermaid-zoom-btn mermaid-zoom-in';
+    btnIn.textContent = '+';
+    btnIn.setAttribute('aria-label', 'Zoom in');
+    btnIn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      zoomTo(scale * 1.25);
+    });
+
+    const btnOut = document.createElement('button');
+    btnOut.className = 'mermaid-zoom-btn mermaid-zoom-out';
+    btnOut.textContent = '−';
+    btnOut.setAttribute('aria-label', 'Zoom out');
+    btnOut.addEventListener('click', (e) => {
+      e.stopPropagation();
+      zoomTo(scale / 1.25);
+    });
+
+    const btnReset = document.createElement('button');
+    btnReset.className = 'mermaid-zoom-btn mermaid-zoom-reset';
+    btnReset.textContent = '↺';
+    btnReset.setAttribute('aria-label', 'Reset zoom');
+    btnReset.addEventListener('click', (e) => {
+      e.stopPropagation();
+      scale = 1;
+      panX = 0;
+      panY = 0;
+      applyTransform();
+    });
+
+    controls.appendChild(btnIn);
+    controls.appendChild(btnOut);
+    controls.appendChild(btnReset);
+    container.appendChild(controls);
+  }
+
+  // Pan with mouse drag
+  svg.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) { return; }
+    isPanning = true;
+    hasDragged = false;
+    startX = e.clientX - panX;
+    startY = e.clientY - panY;
+    svg.style.cursor = 'grabbing';
+    svg.style.transition = 'none';
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!isPanning) { return; }
+    panX = e.clientX - startX;
+    panY = e.clientY - startY;
+    hasDragged = true;
+    applyTransform();
+  });
+  document.addEventListener('mouseup', () => {
+    if (!isPanning) { return; }
+    isPanning = false;
+    svg.style.cursor = 'grab';
+    svg.style.transition = 'transform 0.15s ease';
+  });
+
+  // Double-click to reset
+  svg.addEventListener('dblclick', () => {
+    scale = 1;
+    panX = 0;
+    panY = 0;
+    applyTransform();
+  });
+
+  // Click to fullscreen
+  container.addEventListener('click', (e) => {
+    if (e.detail === 2) { return; } // skip double-click
+    if (container.classList.contains('mermaid-fullscreen-content')) { return; }
+    if (hasDragged) {
+      hasDragged = false;
+      return;
+    }
+    if (scale !== 1 || panX !== 0 || panY !== 0) { return; } // skip if already zoomed/panned
+    openMermaidFullscreen(container);
+  });
+}
+
+function openMermaidFullscreen(container) {
+  const overlay = document.createElement('div');
+  overlay.className = 'mermaid-fullscreen-overlay';
+  const clone = container.cloneNode(true);
+  clone.classList.add('mermaid-fullscreen-content');
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'mermaid-fullscreen-close';
+  closeBtn.textContent = '✕';
+  closeBtn.setAttribute('aria-label', 'Close fullscreen');
+  closeBtn.addEventListener('click', () => overlay.remove());
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) { overlay.remove(); }
+  });
+  document.addEventListener('keydown', function handler(e) {
+    if (e.key === 'Escape') {
+      overlay.remove();
+      document.removeEventListener('keydown', handler);
+    }
+  });
+  overlay.appendChild(clone);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+  // Re-setup interaction on clone
+  setupMermaidInteraction(clone);
+}
+
+function escapeMermaidHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 async function loadMermaid() {

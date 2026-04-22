@@ -10,7 +10,8 @@ export async function exportHtml(sourceUri: vscode.Uri, context: vscode.Extensio
   const markdownText = new TextDecoder().decode(markdown);
   const config = getWorkbenchConfig();
   const toc = extractToc(markdownText);
-  const rendered = renderMarkdown(markdownText, toc);
+  const baseUri = vscode.Uri.joinPath(sourceUri, '..');
+  const rendered = renderMarkdown(markdownText, toc, baseUri);
 
   const themeMode = config.themeMode === 'auto'
     ? (vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Light ? 'light' : 'dark')
