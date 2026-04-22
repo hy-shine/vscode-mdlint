@@ -13,6 +13,7 @@ const themeOptions = document.getElementById('theme-options');
 const styleOptions = document.getElementById('style-options');
 const formatButton = document.getElementById('format-button');
 const exportButton = document.getElementById('export-button');
+const floatingRefresh = document.getElementById('floating-refresh');
 const themeValueEl = document.getElementById('theme-value');
 const styleValueEl = document.getElementById('style-value');
 
@@ -93,6 +94,11 @@ styleOptions.addEventListener('click', (e) => {
   e.stopPropagation();
   vscode.postMessage({ type: 'setPreviewStyle', value: item.dataset.value });
   collapseAllGroups();
+});
+
+// --- Refresh action ---
+floatingRefresh.addEventListener('click', () => {
+  vscode.postMessage({ type: 'refreshPreview' });
 });
 
 // --- Export action ---

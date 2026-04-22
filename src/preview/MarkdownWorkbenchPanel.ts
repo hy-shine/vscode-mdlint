@@ -187,6 +187,9 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
       case 'formatDocument':
         await this.formatActiveDocument();
         return;
+      case 'refreshPreview':
+        await this.update(undefined);
+        return;
       case 'exportHtml':
         if (this.sourceUri) {
           await exportHtml(this.sourceUri, this.context);
@@ -251,6 +254,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
           </div>
         </div>
         <div class="floating-controls" id="floating-controls">
+          <button class="floating-refresh" id="floating-refresh" type="button" aria-label="Refresh preview" title="Refresh preview">↻</button>
           <button class="floating-trigger" id="floating-trigger" type="button" aria-label="Preview settings" title="Preview settings" aria-expanded="false">
             <span class="floating-trigger-ring"></span>
             <span class="floating-trigger-icon" aria-hidden="true">
@@ -333,6 +337,7 @@ type WebviewMessage =
   | { type: 'formatDocument' }
   | { type: 'scrollToLine'; value: number }
   | { type: 'syncEditorScroll'; value: number }
+  | { type: 'refreshPreview' }
   | { type: 'exportHtml' };
 
 function getNonce(): string {
