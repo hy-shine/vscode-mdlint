@@ -155,7 +155,7 @@ window.addEventListener('message', (event) => {
 
 function setBodyPresentation(themeMode, previewStyle) {
   body.classList.remove('theme-auto', 'theme-light', 'theme-dark');
-  body.classList.remove('style-default', 'style-github', 'style-notion', 'style-tokyo-night', 'style-obsidian', 'style-paper');
+  body.classList.remove('style-default', 'style-github', 'style-notion', 'style-tokyo-night', 'style-obsidian', 'style-paper', 'style-typora');
   body.classList.add(`theme-${themeMode}`);
   body.classList.add(`style-${previewStyle}`);
 }
@@ -168,7 +168,8 @@ function syncFloatingMenu(themeMode, previewStyle) {
     item.classList.toggle('is-active', item.dataset.value === previewStyle);
   }
   if (themeValueEl) {
-    themeValueEl.textContent = themeMode.charAt(0).toUpperCase() + themeMode.slice(1).replace('-', ' ');
+    const themeLabels = { auto: 'System', light: 'Light', dark: 'Dark' };
+    themeValueEl.textContent = themeLabels[themeMode] || themeMode;
   }
   if (styleValueEl) {
     styleValueEl.textContent = previewStyle.charAt(0).toUpperCase() + previewStyle.slice(1).replace('-', ' ');

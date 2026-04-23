@@ -1,6 +1,6 @@
 export type ThemeMode = 'auto' | 'light' | 'dark';
 
-export type PreviewStyle = 'default' | 'github' | 'notion' | 'tokyo-night' | 'obsidian' | 'paper';
+export type PreviewStyle = 'default' | 'github' | 'notion' | 'tokyo-night' | 'obsidian' | 'paper' | 'typora';
 
 export interface TocItem {
   level: number;

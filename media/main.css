@@ -1738,6 +1738,255 @@ body.style-paper .toc-link.is-active {
   font-weight: 600;
 }
 
+/* ===== Typora ===== */
+body.style-typora {
+  --bg: #363B40 !important;
+  --panel: #2E3033 !important;
+  --toolbar: #2E3033 !important;
+  --border: #555 !important;
+  --text: #b8bfc6 !important;
+  --muted: #b7b7b7 !important;
+  --accent: #6dc1e7 !important;
+  --code-bg: #2a2d30 !important;
+  --code-border: #444 !important;
+  --inline-code-bg: #2e3135 !important;
+  --inline-code-text: #b8bfc6 !important;
+  --surface-soft: #2E3033 !important;
+}
+
+body.theme-light.style-typora {
+  --bg: #fefefe !important;
+  --panel: #fafafa !important;
+  --toolbar: #f8f8f8 !important;
+  --border: #ddd !important;
+  --text: #333 !important;
+  --muted: #777 !important;
+  --accent: #2484c1 !important;
+  --code-bg: #ffffff !important;
+  --code-border: #ddd !important;
+  --inline-code-bg: #f0f0f0 !important;
+  --inline-code-text: #333 !important;
+  --surface-soft: #f5f5f5 !important;
+}
+
+@media (prefers-color-scheme: light) {
+  body.theme-auto.style-typora {
+    --bg: #fefefe !important;
+    --panel: #fafafa !important;
+    --toolbar: #f8f8f8 !important;
+    --border: #ddd !important;
+    --text: #333 !important;
+    --muted: #777 !important;
+    --accent: #2484c1 !important;
+    --code-bg: #ffffff !important;
+    --code-border: #ddd !important;
+    --inline-code-bg: #f0f0f0 !important;
+    --inline-code-text: #333 !important;
+    --surface-soft: #f5f5f5 !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body.theme-auto.style-typora {
+    --bg: #363B40 !important;
+    --panel: #2E3033 !important;
+    --toolbar: #2E3033 !important;
+    --border: #555 !important;
+    --text: #b8bfc6 !important;
+    --muted: #b7b7b7 !important;
+    --accent: #6dc1e7 !important;
+    --code-bg: #2a2d30 !important;
+    --code-border: #444 !important;
+    --inline-code-bg: #2e3135 !important;
+    --inline-code-text: #b8bfc6 !important;
+    --surface-soft: #2E3033 !important;
+  }
+}
+
+body.style-typora .preview-content {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  max-width: 914px;
+  color: var(--text);
+}
+
+body.theme-light.style-typora .preview-content {
+  font-family: Vollkorn, Palatino, Georgia, 'Times New Roman', Times, serif;
+  font-size: 18px;
+  line-height: 1.6;
+  max-width: 960px;
+  text-align: justify;
+  hyphens: auto;
+}
+
+body.style-typora .preview-content h1,
+body.style-typora .preview-content h2,
+body.style-typora .preview-content h3,
+body.style-typora .preview-content h4,
+body.style-typora .preview-content h5,
+body.style-typora .preview-content h6 {
+  color: var(--text);
+}
+
+body.theme-light.style-typora .preview-content h1,
+body.theme-light.style-typora .preview-content h2 {
+  font-weight: bold;
+}
+
+body.style-typora .preview-content h1 {
+  margin-top: 1.6em;
+  margin-bottom: 0.8em;
+  font-size: 2.25em;
+  line-height: 1.2;
+}
+
+body.style-typora .preview-content h2 {
+  margin-top: 1.5em;
+  margin-bottom: 0.6em;
+  font-size: 1.75em;
+  line-height: 1.225;
+}
+
+
+body.style-typora .preview-content h3 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-size: 1.5em;
+  line-height: 1.43;
+}
+
+
+body.style-typora .preview-content h4 {
+  margin-top: 1.25em;
+  margin-bottom: 0.4em;
+  font-size: 1.25em;
+}
+
+body.style-typora .preview-content h5 {
+  margin-top: 1em;
+  margin-bottom: 0.3em;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+body.style-typora .preview-content h6 {
+  margin-top: 1em;
+  margin-bottom: 0.3em;
+  font-size: 1em;
+  color: var(--muted);
+}
+
+body.style-typora .preview-content p,
+body.style-typora .preview-content ul,
+body.style-typora .preview-content ol,
+body.style-typora .preview-content blockquote,
+body.style-typora .preview-content table,
+body.style-typora .preview-content pre {
+  margin-top: 0;
+  margin-bottom: 0.8em;
+}
+
+body.style-typora .preview-content ul,
+body.style-typora .preview-content ol {
+  padding-left: 1.875rem;
+}
+
+body.style-typora .preview-content li + li {
+  margin-top: 0.25em;
+}
+
+body.style-typora .preview-content a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+body.style-typora .preview-content a:hover {
+  text-decoration: underline;
+}
+
+body.style-typora .preview-content blockquote {
+  padding-left: 1.875rem;
+  margin: 0 0 1.5em 1.875rem;
+  border-left: solid 2px var(--border);
+  color: var(--muted);
+}
+
+body.style-typora .preview-content pre {
+  border-radius: 0;
+  border: 1px solid var(--code-border);
+  background: var(--code-bg);
+}
+
+body.style-typora .preview-content code {
+  background: var(--inline-code-bg);
+  color: var(--inline-code-text);
+  border-radius: 2px;
+  padding: 0.2em 0.4em;
+  font-size: 0.875em;
+  font-family: Consolas, 'Menlo', Monaco, monospace, serif;
+}
+
+body.style-typora .preview-content pre code {
+  background: transparent;
+  color: inherit;
+  border-radius: 0;
+  padding: 0;
+  font-size: 1em;
+}
+
+body.style-typora .preview-content table {
+  border-collapse: collapse;
+}
+
+body.style-typora .preview-content th,
+body.style-typora .preview-content td {
+  padding: 8px;
+  border-top: 1px solid var(--border);
+}
+
+body.style-typora .preview-content th {
+  font-weight: bold;
+  border-bottom: 2px solid var(--border);
+}
+
+body.style-typora .preview-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
+}
+
+body.style-typora .preview-content img {
+  max-width: 100%;
+}
+
+body.style-typora .mermaid-diagram {
+  border-radius: 2px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+/* Typora: light TOC */
+body.theme-light.style-typora .outline-panel {
+  font-family: Vollkorn, Palatino, Georgia, 'Times New Roman', Times, serif;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+body.theme-light.style-typora .toc-link.is-active {
+  border-left-color: var(--accent);
+  background: transparent;
+  font-weight: 600;
+}
+
+/* Typora: dark TOC */
+body.theme-dark.style-typora .outline-panel,
+body.theme-auto.style-typora .outline-panel {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 /* ===== Floating Controls ===== */
 .floating-controls {
   position: fixed;

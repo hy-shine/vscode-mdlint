@@ -300,11 +300,11 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
           <span class="floating-menu-group-copy">
             <span class="floating-menu-group-label">Theme</span>
           </span>
-          <span class="floating-menu-group-value" id="theme-value">Auto</span>
+          <span class="floating-menu-group-value" id="theme-value">System</span>
           <span class="floating-menu-group-arrow">&#9656;</span>
         </button>
         <div class="floating-menu-sub" id="theme-options">
-          <button class="floating-menu-item" data-value="auto">Auto</button>
+          <button class="floating-menu-item" data-value="auto">System</button>
           <button class="floating-menu-item" data-value="light">Light</button>
           <button class="floating-menu-item" data-value="dark">Dark</button>
         </div>
@@ -323,6 +323,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
           <button class="floating-menu-item" data-value="tokyo-night">Tokyo Night</button>
           <button class="floating-menu-item" data-value="obsidian">Obsidian</button>
           <button class="floating-menu-item" data-value="paper">Paper</button>
+          <button class="floating-menu-item" data-value="typora">Typora</button>
         </div>
         <div class="floating-menu-divider"></div>
         <div class="floating-menu-section-label">Actions</div>
