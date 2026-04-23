@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0] - 2026-04-23
+
+### Added
+- Add typora preview style (Whitey light / Night dark themes)
+
+### Changed
+- Theme mode display name: 'Auto' → 'System' for better clarity
+
+### Fixed
+- Tokyo Night: fix font family and light mode colors
+- Obsidian: update colors to match official design tokens
+- Notion Dark mode: update colors to match official design
+- GitHub: update style to latest Primer tokens
+
 ## [0.1.1] - 2026-04-23
 
 ### Changed
