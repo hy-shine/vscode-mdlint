@@ -1116,29 +1116,29 @@ body.style-notion .preview-content .callout {
 
 /* ===== Tokyo Night ===== */
 body.style-tokyo-night {
-  --bg: #1a1b2f !important;
-  --panel: #16171e !important;
-  --toolbar: #16171e !important;
+  --bg: #1a1b26 !important;
+  --panel: #16161e !important;
+  --toolbar: #16161e !important;
   --border: rgba(187, 154, 247, 0.12) !important;
   --text: #a9b1d6 !important;
   --muted: #565f89 !important;
   --accent: #7aa2f7 !important;
-  --code-bg: #1e1f33 !important;
+  --code-bg: #1f2328 !important;
 }
 
 body.theme-light.style-tokyo-night {
-  --bg: #d5d6db !important;
-  --panel: #c8c9cf !important;
-  --toolbar: #c8c9cf !important;
+  --bg: #e6e7ed !important;
+  --panel: #dcdee3 !important;
+  --toolbar: #dcdee3 !important;
   --border: rgba(52, 53, 70, 0.2) !important;
-  --text: #1a1b2f !important;
-  --muted: #56576e !important;
-  --accent: #7b68ee !important;
-  --code-bg: #bfbec8 !important;
+  --text: #343b58 !important;
+  --muted: #6c6e75 !important;
+  --accent: #2959aa !important;
+  --code-bg: #d6d8df !important;
 }
 
 body.style-tokyo-night .preview-content {
-  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   line-height: 1.75;
   font-size: 15px;
 }
@@ -1492,9 +1492,9 @@ body.theme-dark.style-paper {
 
 body.style-paper .preview-content {
   font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
-  font-size: 15px;
-  line-height: 1.65;
-  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 680px;
   color: var(--text);
   text-rendering: optimizeLegibility;
 }
@@ -1534,7 +1534,6 @@ body.style-paper .preview-content h3 {
   margin-bottom: 0.45em;
   font-size: 1.12em;
   font-weight: 700;
-  font-style: italic;
   line-height: 1.32;
 }
 
@@ -1545,7 +1544,6 @@ body.style-paper .preview-content h6 {
   margin-bottom: 0.4em;
   font-size: 1em;
   font-weight: 700;
-  font-style: italic;
 }
 
 body.style-paper .preview-content p,
@@ -1561,6 +1559,8 @@ body.style-paper .preview-content pre {
 body.style-paper .preview-content p {
   text-align: justify;
   hyphens: auto;
+  text-indent: 1.25em;
+  margin-bottom: 0;
 }
 
 body.style-paper .preview-content ul,
@@ -1630,10 +1630,6 @@ body.style-paper .preview-content th {
 body.style-paper .preview-content td {
   padding: 6px 10px;
   border-bottom: 1px solid var(--border);
-}
-
-body.style-paper .preview-content tr:last-child td {
-  border-bottom: none;
 }
 
 body.style-paper .preview-content hr {
