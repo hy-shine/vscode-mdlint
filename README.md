@@ -1,7 +1,8 @@
 # MDLint
 
-<!-- TODO: Add hero screenshot/GIF here before publishing -->
-<!-- Recommended: 1280x800 showing split view with preview panel -->
+| | |
+|:---:|:---:|
+| ![Dark Mode Preview](./images/hero-dark.png) | ![Light Mode Preview](./images/hero-light.png) |
 
 A polished Markdown preview extension for VS Code. Open a side panel with live rendering, table of contents, scroll sync, multiple themes, math formulas, code highlighting, and one-click HTML export.
 
@@ -28,6 +29,7 @@ Choose a look that fits your workflow:
 | **Notion** | Clean, spacious editorial style |
 | **Tokyo Night** | Low-contrast dark inspired by the editor theme |
 | **Obsidian** | Inspired by the Obsidian app aesthetic |
+| **Paper** | Ink on cream paper, print-ready |
 
 Each style supports **Auto / Light / Dark** mode and switches with your VS Code theme when set to Auto.
 
@@ -57,7 +59,7 @@ Search for `mdlint` in VS Code Settings:
 | Setting | Default | Options |
 |---------|---------|---------|
 | `mdlint.themeMode` | `auto` | `auto` · `light` · `dark` |
-| `mdlint.previewStyle` | `default` | `default` · `github` · `notion` · `tokyo-night` · `obsidian` |
+| `mdlint.previewStyle` | `default` | `default` · `github` · `notion` · `tokyo-night` · `obsidian` · `paper` |
 | `mdlint.showToc` | `true` | `true` · `false` |
 
 ---

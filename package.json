@@ -35,7 +35,7 @@
     "commands": [
       {
         "command": "mdlint.openPreview",
-        "title": "mdlint: Open Preview",
+        "title": "Open Preview",
         "icon": "$(open-preview)"
       },
       {
@@ -60,13 +60,6 @@
         }
       ]
     },
-    "keybindings": [
-      {
-        "command": "mdlint.openPreview",
-        "key": "ctrl+shift+v",
-        "when": "resourceLangId == markdown"
-      }
-    ],
     "configuration": {
       "title": "mdlint",
       "properties": {
