@@ -1282,19 +1282,19 @@ body.style-obsidian {
   --toolbar: #252526 !important;
   --border: rgba(100, 100, 100, 0.22) !important;
   --text: #d4d4d4 !important;
-  --muted: #858585 !important;
-  --accent: #7b68ee !important;
+  --muted: #999999 !important;
+  --accent: #a882ff !important;
   --code-bg: #1a1a1a !important;
 }
 
 body.theme-light.style-obsidian {
-  --bg: #fafafa !important;
+  --bg: #ffffff !important;
   --panel: #f3f3f3 !important;
   --toolbar: #f3f3f3 !important;
   --border: rgba(0, 0, 0, 0.08) !important;
   --text: #2e2e2e !important;
   --muted: #6e6e6e !important;
-  --accent: #7b68ee !important;
+  --accent: #7852ee !important;
   --code-bg: #f0f0f0 !important;
 }
 
