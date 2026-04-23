@@ -805,22 +805,22 @@ body.theme-light .hljs-variable.language {
 /* ===== GitHub ===== */
 body.style-github {
   --bg: #0d1117 !important;
-  --panel: #161b22 !important;
-  --toolbar: #161b22 !important;
-  --border: rgba(48, 54, 61, 0.6) !important;
-  --text: #c9d1d9 !important;
-  --muted: #8b949e !important;
-  --accent: #58a6ff !important;
-  --code-bg: #161b22 !important;
+  --panel: #151b23 !important;
+  --toolbar: #151b23 !important;
+  --border: #3d444d !important;
+  --text: #f0f6fc !important;
+  --muted: #9198a1 !important;
+  --accent: #4493f8 !important;
+  --code-bg: #151b23 !important;
 }
 
 body.theme-light.style-github {
   --bg: #ffffff !important;
   --panel: #f6f8fa !important;
   --toolbar: #f6f8fa !important;
-  --border: #d0d7de !important;
-  --text: #24292f !important;
-  --muted: #57606a !important;
+  --border: #d1d9e0 !important;
+  --text: #1f2328 !important;
+  --muted: #656d76 !important;
   --accent: #0969da !important;
   --code-bg: #f6f8fa !important;
 }
