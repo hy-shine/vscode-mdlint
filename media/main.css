@@ -960,11 +960,11 @@ body.style-github .mermaid-diagram {
 
 /* ===== Notion ===== */
 body.style-notion {
-  --bg: #191919 !important;
+  --bg: #2f3437 !important;
   --panel: #202020 !important;
   --toolbar: #202020 !important;
   --border: rgba(255, 255, 255, 0.09) !important;
-  --text: #d4d4d4 !important;
+  --text: #e6e6e6 !important;
   --muted: #999999 !important;
   --accent: #529cca !important;
   --code-bg: #262626 !important;
@@ -982,7 +982,7 @@ body.theme-light.style-notion {
 }
 
 body.style-notion .preview-content {
-  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-family: 'Inter', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   line-height: 1.75;
   font-size: 16px;
   max-width: 900px;
