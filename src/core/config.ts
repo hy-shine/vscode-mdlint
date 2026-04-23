@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { PreviewStyle, ThemeMode } from '../types';
 
-const SECTION = 'mdlint';
+const SECTION = 'markdown-lint';
 
 export interface WorkbenchConfig {
   themeMode: ThemeMode;

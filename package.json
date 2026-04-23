@@ -1,19 +1,19 @@
 {
-  "name": "mdlint",
-  "displayName": "MDLint",
+  "name": "markdown-lint",
+  "displayName": "Markdown Lint Preview",
   "description": "Enhanced Markdown preview with multiple themes, table of contents, math formulas, code highlighting, and export capabilities.",
   "version": "0.1.0",
-  "publisher": "jessy",
+  "publisher": "hyshine",
   "license": "MIT",
   "author": "jessy",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hy-shine/vscode-mdlint"
+    "url": "https://github.com/hy-shine/vscode-markdown-lint.git"
   },
   "bugs": {
-    "url": "https://github.com/hy-shine/vscode-mdlint/issues"
+    "url": "https://github.com/hy-shine/vscode-markdown-lint/issues"
   },
-  "homepage": "https://github.com/hy-shine/vscode-mdlint#readme",
+  "homepage": "https://github.com/hy-shine/vscode-markdown-lint#readme",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -22,10 +22,12 @@
     "Other"
   ],
   "keywords": [
-    "markdown",
-    "preview",
-    "toc"
-  ],
+  "markdown",
+  "preview",
+  "toc",
+  "mermaid",
+  "formatter"
+],
   "icon": "images/icon.png",
   "main": "./dist/extension.js",
   "activationEvents": [
@@ -34,42 +36,42 @@
   "contributes": {
     "commands": [
       {
-        "command": "mdlint.openPreview",
+        "command": "markdown-lint.openPreview",
         "title": "Open Preview",
         "icon": "$(open-preview)"
       },
       {
-        "command": "mdlint.formatDocument",
-        "title": "mdlint: Format Document"
+        "command": "markdown-lint.formatDocument",
+        "title": "Markdown Lint: Format Document"
       },
       {
-        "command": "mdlint.refreshToc",
-        "title": "mdlint: Refresh TOC"
+        "command": "markdown-lint.refreshToc",
+        "title": "Markdown Lint: Refresh TOC"
       },
       {
-        "command": "mdlint.exportHtml",
-        "title": "mdlint: Export HTML"
+        "command": "markdown-lint.exportHtml",
+        "title": "Markdown Lint: Export HTML"
       }
     ],
     "menus": {
       "editor/title": [
         {
-          "command": "mdlint.openPreview",
+          "command": "markdown-lint.openPreview",
           "when": "resourceLangId == markdown",
           "group": "navigation"
         }
       ]
     },
     "configuration": {
-      "title": "mdlint",
+      "title": "markdown-lint",
       "properties": {
-        "mdlint.themeMode": {
+        "markdown-lint.themeMode": {
           "type": "string",
           "enum": ["auto", "light", "dark"],
           "default": "auto",
-          "description": "Theme mode for the MDLint preview."
+          "description": "Theme mode for the Markdown Lint preview."
         },
-        "mdlint.previewStyle": {
+        "markdown-lint.previewStyle": {
           "type": "string",
           "enum": ["default", "github", "notion", "tokyo-night", "obsidian", "paper"],
           "enumDescriptions": [
@@ -81,9 +83,9 @@
             "Paper-like document style"
           ],
           "default": "default",
-          "description": "Preview style preset for the MDLint preview. Options: default, github, notion, tokyo-night, obsidian, paper."
+          "description": "Preview style preset for the Markdown Lint preview. Options: default, github, notion, tokyo-night, obsidian, paper."
         },
-        "mdlint.showToc": {
+        "markdown-lint.showToc": {
           "type": "boolean",
           "default": true,
           "description": "Show the table of contents sidebar in the preview."

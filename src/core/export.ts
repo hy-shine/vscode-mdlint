@@ -8,16 +8,16 @@ import { extractToc } from './toc';
 export async function exportHtml(sourceUri: vscode.Uri, context: vscode.ExtensionContext): Promise<void> {
   const markdown = await vscode.workspace.fs.readFile(sourceUri);
   const markdownText = new TextDecoder().decode(markdown);
-  console.log('[mdlint] exportHtml: markdown length', markdownText.length);
+  console.log('[markdown-lint] exportHtml: markdown length', markdownText.length);
   const config = getWorkbenchConfig();
   const toc = extractToc(markdownText);
   const baseUri = vscode.Uri.joinPath(sourceUri, '..');
   let rendered: { html: string };
   try {
     rendered = renderMarkdown(markdownText, toc, baseUri);
-    console.log('[mdlint] exportHtml: rendered html length', rendered.html.length);
+    console.log('[markdown-lint] exportHtml: rendered html length', rendered.html.length);
   } catch (err) {
-    console.error('[mdlint] exportHtml: renderMarkdown failed', err);
+    console.error('[markdown-lint] exportHtml: renderMarkdown failed', err);
     throw err;
   }
 
@@ -49,9 +49,9 @@ export async function exportHtml(sourceUri: vscode.Uri, context: vscode.Extensio
   const targetPath = sourceUri.fsPath.replace(/\.md$/, '.html');
   const targetUri = vscode.Uri.file(targetPath);
 
-  console.log('[mdlint] exportHtml: final html length', html.length);
+  console.log('[markdown-lint] exportHtml: final html length', html.length);
   await vscode.workspace.fs.writeFile(targetUri, new TextEncoder().encode(html));
-  console.log('[mdlint] exportHtml: wrote file', targetPath);
+  console.log('[markdown-lint] exportHtml: wrote file', targetPath);
   await vscode.window.showInformationMessage(`Exported HTML: ${targetPath}`, 'Open').then((choice) => {
     if (choice === 'Open') {
       void vscode.env.openExternal(targetUri);

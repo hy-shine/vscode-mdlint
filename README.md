@@ -1,4 +1,4 @@
-# MDLint
+# markdown-lint
 
 | | |
 |:---:|:---:|
@@ -11,7 +11,7 @@ A polished Markdown preview extension for VS Code. Open a side panel with live r
 ## Quick Start
 
 1. Open any `.md` file
-2. Click the preview icon in the editor title bar, or run `mdlint: Open Preview` from the Command Palette
+2. Click the preview icon in the editor title bar, or run `Open Preview` from the Command Palette
 3. Switch themes and styles from the floating menu in the preview panel
 
 ---
@@ -54,22 +54,22 @@ Export your Markdown to a standalone HTML file with all styles inlined — ready
 
 ## Settings
 
-Search for `mdlint` in VS Code Settings:
+Search for `markdown-lint` in VS Code Settings:
 
 | Setting | Default | Options |
 |---------|---------|---------|
-| `mdlint.themeMode` | `auto` | `auto` · `light` · `dark` |
-| `mdlint.previewStyle` | `default` | `default` · `github` · `notion` · `tokyo-night` · `obsidian` · `paper` |
-| `mdlint.showToc` | `true` | `true` · `false` |
+| `markdown-lint.themeMode` | `auto` | `auto` · `light` · `dark` |
+| `markdown-lint.previewStyle` | `default` | `default` · `github` · `notion` · `tokyo-night` · `obsidian` · `paper` |
+| `markdown-lint.showToc` | `true` | `true` · `false` |
 
 ---
 
 ## Available Commands
 
-- `mdlint: Open Preview` (`mdlint.openPreview`) — Open the preview panel
-- `mdlint: Format Document` (`mdlint.formatDocument`) — Clean up Markdown structure
-- `mdlint: Refresh TOC` (`mdlint.refreshToc`) — Re-extract headings
-- `mdlint: Export HTML` (`mdlint.exportHtml`) — Save as standalone HTML
+- `markdown-lint: Open Preview` (`markdown-lint.openPreview`) — Open the preview panel
+- `markdown-lint: Format Document` (`markdown-lint.formatDocument`) — Clean up Markdown structure
+- `markdown-lint: Refresh TOC` (`markdown-lint.refreshToc`) — Re-extract headings
+- `markdown-lint: Export HTML` (`markdown-lint.exportHtml`) — Save as standalone HTML
 
 ---
 
