@@ -1,5 +1,4 @@
 :root {
-  color-scheme: light dark;
   --bg: var(--vscode-editor-background);
   --panel: var(--vscode-sideBar-background);
   --toolbar: color-mix(in srgb, var(--bg) 82%, white 18%);
@@ -15,7 +14,9 @@
   --preview-top-inset: 56px;
 }
 
+
 body.theme-light {
+  color-scheme: light;
   --bg: #f5f5f5 !important;
   --panel: #ffffff !important;
   --toolbar: #ffffff !important;
@@ -31,6 +32,7 @@ body.theme-light {
 }
 
 body.theme-dark {
+  color-scheme: dark;
   --bg: #222223 !important;
   --panel: #282829 !important;
   --toolbar: #282829 !important;
@@ -62,6 +64,7 @@ body.theme-auto {
 
 @media (prefers-color-scheme: light) {
   body.theme-auto {
+    color-scheme: light;
     --bg: #f5f5f5 !important;
     --panel: #ffffff !important;
     --toolbar: #ffffff !important;
@@ -79,6 +82,7 @@ body.theme-auto {
 
 @media (prefers-color-scheme: dark) {
   body.theme-auto {
+    color-scheme: dark;
     --bg: #222223 !important;
     --panel: #282829 !important;
     --toolbar: #282829 !important;
@@ -96,7 +100,6 @@ body.theme-auto {
 
 body {
   margin: 0;
-  overflow: hidden;
   background: var(--bg);
   color: var(--text);
   font-family: var(--vscode-font-family, Inter, system-ui, sans-serif);
@@ -111,25 +114,6 @@ select {
   font: inherit;
 }
 
-.app-shell {
-  height: 100vh;
-  overflow: hidden;
-}
-
-.main-panel {
-  display: grid;
-  grid-template-rows: 1fr;
-  min-width: 0;
-  height: 100vh;
-}
-
-.content-area {
-  height: 100%;
-  overflow: auto;
-  position: relative;
-  scroll-padding-top: calc(var(--preview-top-inset) + 8px);
-  contain: layout;
-}
 
 .preview-content {
   width: min(920px, calc(100% - 32px));
@@ -138,9 +122,14 @@ select {
   line-height: 1.7;
   font-size: 15px;
   overflow-wrap: break-word;
+  scroll-padding-top: calc(var(--preview-top-inset) + 8px);
 }
 
-.preview-content img {
+.preview-content img,
+.preview-content svg,
+.preview-content video,
+.preview-content canvas,
+.preview-content iframe {
   max-width: 100%;
   height: auto;
 }
@@ -178,6 +167,7 @@ select {
   border: 1px solid var(--code-border);
   padding: 16px;
   overflow: auto;
+  max-width: 100%;
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
@@ -488,6 +478,7 @@ body.theme-light .hljs-variable.language {
   padding-left: 1em;
   border-left: 3px solid var(--border);
   color: var(--muted);
+  background: transparent;
 }
 
 .preview-content table {
@@ -510,6 +501,12 @@ body.theme-light .hljs-variable.language {
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0.3rem 0;
+  max-width: 100%;
+}
+
+.preview-content .katex-display .katex {
+  max-width: 100%;
+  display: inline-block;
 }
 
 .preview-content .katex-display .katex-block {
@@ -559,7 +556,6 @@ body.theme-light .hljs-variable.language {
   padding: 3px;
   border-radius: 8px;
   background: color-mix(in srgb, var(--panel) 80%, transparent);
-  backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -608,7 +604,9 @@ body.theme-light .hljs-variable.language {
 }
 
 .mermaid-diagram svg foreignObject {
-  overflow: visible;
+  overflow: hidden;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 /* Font override for all SVG text */
@@ -708,7 +706,7 @@ body.theme-light .hljs-variable.language {
   color: var(--accent);
 }
 
-/* ===== Outline Control (top-right fixed) ===== */
+/* ===== Outline Control (top-right) ===== */
 .outline-control {
   position: fixed;
   top: 12px;
@@ -1772,7 +1770,6 @@ body.style-paper .toc-link.is-active {
   justify-content: center;
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
   overflow: hidden;
-  backdrop-filter: blur(10px);
 }
 
 .floating-trigger-ring {
@@ -1817,7 +1814,6 @@ body.style-paper .toc-link.is-active {
   align-items: center;
   justify-content: center;
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
-  backdrop-filter: blur(10px);
 }
 
 .floating-refresh:hover {
@@ -1866,7 +1862,6 @@ body.style-paper .toc-link.is-active {
   border-radius: 16px;
   padding: 10px;
   box-shadow: 0 22px 48px rgba(15, 23, 42, 0.24);
-  backdrop-filter: blur(14px);
 }
 
 .floating-controls.is-open .floating-menu {

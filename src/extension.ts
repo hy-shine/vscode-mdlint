@@ -68,6 +68,8 @@ export function activate(context: vscode.ExtensionContext): void {
           return;
         }
 
+        panel.notifyResize();
+
         const ranges = event.visibleRanges;
         if (ranges.length === 0) {
           return;

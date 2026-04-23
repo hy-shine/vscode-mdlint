@@ -11,6 +11,9 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
   private sourceUri: vscode.Uri | undefined;
   private readonly disposables: vscode.Disposable[] = [];
   private isScrollingFromPreview = false;
+  private isResizing = false;
+  private resizeTimer: ReturnType<typeof setTimeout> | undefined;
+  private scrollSyncTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -37,6 +40,10 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
 
       this.panel.webview.onDidReceiveMessage(async (message: WebviewMessage) => {
         await this.handleMessage(message);
+      }, null, this.disposables);
+
+      this.panel.onDidChangeViewState(() => {
+        this.notifyResize();
       }, null, this.disposables);
 
       this.panel.webview.html = this.getHtml(this.panel.webview);
@@ -90,11 +97,28 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
   }
 
   public postVisibleLineRange(line: number): void {
-    if (!this.panel) {
+    if (!this.panel || this.isResizing) {
       return;
     }
 
-    void this.panel.webview.postMessage({ type: 'scrollToLine', value: line });
+    if (this.scrollSyncTimer) {
+      clearTimeout(this.scrollSyncTimer);
+    }
+    this.scrollSyncTimer = setTimeout(() => {
+      if (!this.isResizing) {
+        void this.panel?.webview.postMessage({ type: 'scrollToLine', value: line });
+      }
+    }, 50);
+  }
+
+  public notifyResize(): void {
+    this.isResizing = true;
+    if (this.resizeTimer) {
+      clearTimeout(this.resizeTimer);
+    }
+    this.resizeTimer = setTimeout(() => {
+      this.isResizing = false;
+    }, 300);
   }
 
   public async formatActiveDocument(): Promise<void> {
@@ -244,85 +268,79 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     <title>MDLint</title>
   </head>
   <body>
-    <div class="app-shell">
-      <section class="main-panel">
-        <div class="outline-control" id="outline-control">
-          <button class="outline-trigger" id="outline-trigger" type="button" aria-label="TOC" title="TOC">&#9776;</button>
-          <div class="outline-panel" id="outline-panel">
-            <div class="outline-panel-title">TOC</div>
-            <nav id="toc-list" class="toc-list"></nav>
-          </div>
-        </div>
-        <div class="floating-controls" id="floating-controls">
-          <button class="floating-refresh" id="floating-refresh" type="button" aria-label="Refresh preview" title="Refresh preview">↻</button>
-          <button class="floating-trigger" id="floating-trigger" type="button" aria-label="Preview settings" title="Preview settings" aria-expanded="false">
-            <span class="floating-trigger-ring"></span>
-            <span class="floating-trigger-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="none" focusable="false">
-                <path d="M4 5.25h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M4 10h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M4 14.75h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                <circle cx="7" cy="5.25" r="1.9" fill="currentColor"/>
-                <circle cx="13" cy="10" r="1.9" fill="currentColor"/>
-                <circle cx="9.5" cy="14.75" r="1.9" fill="currentColor"/>
-              </svg>
-            </span>
-          </button>
-          <div class="floating-menu" id="floating-menu">
-            <div class="floating-menu-header">
-              <div class="floating-menu-eyebrow">Preview</div>
-            </div>
-            <div class="floating-menu-section-label">Appearance</div>
-            <button class="floating-menu-group" data-group="theme" type="button" aria-expanded="false">
-              <span class="floating-menu-group-icon" aria-hidden="true">◐</span>
-              <span class="floating-menu-group-copy">
-                <span class="floating-menu-group-label">Theme</span>
-              </span>
-              <span class="floating-menu-group-value" id="theme-value">Auto</span>
-              <span class="floating-menu-group-arrow">&#9656;</span>
-            </button>
-            <div class="floating-menu-sub" id="theme-options">
-              <button class="floating-menu-item" data-value="auto">Auto</button>
-              <button class="floating-menu-item" data-value="light">Light</button>
-              <button class="floating-menu-item" data-value="dark">Dark</button>
-            </div>
-            <button class="floating-menu-group" data-group="style" type="button" aria-expanded="false">
-              <span class="floating-menu-group-icon" aria-hidden="true">✦</span>
-              <span class="floating-menu-group-copy">
-                <span class="floating-menu-group-label">Style</span>
-              </span>
-              <span class="floating-menu-group-value" id="style-value">Default</span>
-              <span class="floating-menu-group-arrow">&#9656;</span>
-            </button>
-            <div class="floating-menu-sub" id="style-options">
-              <button class="floating-menu-item" data-value="default">Default</button>
-              <button class="floating-menu-item" data-value="github">GitHub</button>
-              <button class="floating-menu-item" data-value="notion">Notion</button>
-              <button class="floating-menu-item" data-value="tokyo-night">Tokyo Night</button>
-              <button class="floating-menu-item" data-value="obsidian">Obsidian</button>
-              <button class="floating-menu-item" data-value="paper">Paper</button>
-            </div>
-            <div class="floating-menu-divider"></div>
-            <div class="floating-menu-section-label">Actions</div>
-            <button class="floating-menu-action" id="format-button" type="button">
-              <span class="floating-menu-action-icon" aria-hidden="true">⌘</span>
-              <span class="floating-menu-action-copy">
-                <span class="floating-menu-action-title">Format Document</span>
-              </span>
-            </button>
-            <button class="floating-menu-action" id="export-button" type="button">
-              <span class="floating-menu-action-icon" aria-hidden="true">↗</span>
-              <span class="floating-menu-action-copy">
-                <span class="floating-menu-action-title">Export HTML</span>
-              </span>
-            </button>
-          </div>
-        </div>
-        <main class="content-area">
-          <article id="preview-content" class="preview-content"></article>
-        </main>
-      </section>
+    <div class="outline-control" id="outline-control">
+      <button class="outline-trigger" id="outline-trigger" type="button" aria-label="TOC" title="TOC">&#9776;</button>
+      <div class="outline-panel" id="outline-panel">
+        <div class="outline-panel-title">TOC</div>
+        <nav id="toc-list" class="toc-list"></nav>
+      </div>
     </div>
+    <div class="floating-controls" id="floating-controls">
+      <button class="floating-refresh" id="floating-refresh" type="button" aria-label="Refresh preview" title="Refresh preview">↻</button>
+      <button class="floating-trigger" id="floating-trigger" type="button" aria-label="Preview settings" title="Preview settings" aria-expanded="false">
+        <span class="floating-trigger-ring"></span>
+        <span class="floating-trigger-icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none" focusable="false">
+            <path d="M4 5.25h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M4 10h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M4 14.75h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="7" cy="5.25" r="1.9" fill="currentColor"/>
+            <circle cx="13" cy="10" r="1.9" fill="currentColor"/>
+            <circle cx="9.5" cy="14.75" r="1.9" fill="currentColor"/>
+          </svg>
+        </span>
+      </button>
+      <div class="floating-menu" id="floating-menu">
+        <div class="floating-menu-header">
+          <div class="floating-menu-eyebrow">Preview</div>
+        </div>
+        <div class="floating-menu-section-label">Appearance</div>
+        <button class="floating-menu-group" data-group="theme" type="button" aria-expanded="false">
+          <span class="floating-menu-group-icon" aria-hidden="true">◐</span>
+          <span class="floating-menu-group-copy">
+            <span class="floating-menu-group-label">Theme</span>
+          </span>
+          <span class="floating-menu-group-value" id="theme-value">Auto</span>
+          <span class="floating-menu-group-arrow">&#9656;</span>
+        </button>
+        <div class="floating-menu-sub" id="theme-options">
+          <button class="floating-menu-item" data-value="auto">Auto</button>
+          <button class="floating-menu-item" data-value="light">Light</button>
+          <button class="floating-menu-item" data-value="dark">Dark</button>
+        </div>
+        <button class="floating-menu-group" data-group="style" type="button" aria-expanded="false">
+          <span class="floating-menu-group-icon" aria-hidden="true">✦</span>
+          <span class="floating-menu-group-copy">
+            <span class="floating-menu-group-label">Style</span>
+          </span>
+          <span class="floating-menu-group-value" id="style-value">Default</span>
+          <span class="floating-menu-group-arrow">&#9656;</span>
+        </button>
+        <div class="floating-menu-sub" id="style-options">
+          <button class="floating-menu-item" data-value="default">Default</button>
+          <button class="floating-menu-item" data-value="github">GitHub</button>
+          <button class="floating-menu-item" data-value="notion">Notion</button>
+          <button class="floating-menu-item" data-value="tokyo-night">Tokyo Night</button>
+          <button class="floating-menu-item" data-value="obsidian">Obsidian</button>
+          <button class="floating-menu-item" data-value="paper">Paper</button>
+        </div>
+        <div class="floating-menu-divider"></div>
+        <div class="floating-menu-section-label">Actions</div>
+        <button class="floating-menu-action" id="format-button" type="button">
+          <span class="floating-menu-action-icon" aria-hidden="true">⌘</span>
+          <span class="floating-menu-action-copy">
+            <span class="floating-menu-action-title">Format Document</span>
+          </span>
+        </button>
+        <button class="floating-menu-action" id="export-button" type="button">
+          <span class="floating-menu-action-icon" aria-hidden="true">↗</span>
+          <span class="floating-menu-action-copy">
+            <span class="floating-menu-action-title">Export HTML</span>
+          </span>
+        </button>
+      </div>
+    </div>
+    <main id="preview-content" class="preview-content"></main>
     <script nonce="${nonce}" src="${scriptUri}"></script>
   </body>
 </html>`;

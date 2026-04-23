@@ -2,7 +2,6 @@ const vscode = acquireVsCodeApi();
 
 const body = document.body;
 const previewContent = document.getElementById('preview-content');
-const contentArea = document.querySelector('.content-area');
 const tocList = document.getElementById('toc-list');
 const outlineControl = document.getElementById('outline-control');
 const outlineTrigger = document.getElementById('outline-trigger');
@@ -203,7 +202,7 @@ function renderToc(items) {
   }
 }
 
-contentArea.addEventListener('scroll', () => {
+window.addEventListener('scroll', () => {
   if (!suppressScrollSync) {
     updateActiveTocLink();
   }
@@ -222,7 +221,7 @@ contentArea.addEventListener('scroll', () => {
     }
 
     const headings = previewContent.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    const areaRect = contentArea.getBoundingClientRect();
+    const areaRect = { top: 0, bottom: window.innerHeight };
     let bestHeading = null;
     let bestOffset = Infinity;
 
@@ -309,10 +308,10 @@ function highlightTocItem(slug) {
 
 function updateActiveTocLink() {
   const headings = previewContent.querySelectorAll('h1, h2, h3, h4, h5, h6');
-  const areaRect = contentArea.getBoundingClientRect();
+  const areaRect = { top: 0, bottom: window.innerHeight };
   let activeId = null;
 
-  const isAtBottom = contentArea.scrollHeight - contentArea.scrollTop - contentArea.clientHeight < 40;
+  const isAtBottom = document.documentElement.scrollHeight - window.scrollY - window.innerHeight < 40;
 
   for (const heading of headings) {
     const rect = heading.getBoundingClientRect();

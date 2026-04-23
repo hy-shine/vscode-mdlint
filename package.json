@@ -18,8 +18,8 @@
     "vscode": "^1.90.0"
   },
   "categories": [
-    "Other",
-    "Markdown"
+    "Formatters",
+    "Other"
   ],
   "keywords": [
     "markdown",
@@ -60,6 +60,13 @@
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "mdlint.openPreview",
+        "key": "ctrl+shift+v",
+        "when": "resourceLangId == markdown"
+      }
+    ],
     "configuration": {
       "title": "mdlint",
       "properties": {
@@ -72,6 +79,14 @@
         "mdlint.previewStyle": {
           "type": "string",
           "enum": ["default", "github", "notion", "tokyo-night", "obsidian", "paper"],
+          "enumDescriptions": [
+            "Default clean style",
+            "GitHub-flavored markdown style",
+            "Notion-like minimal style",
+            "Tokyo Night dark theme style",
+            "Obsidian-inspired style",
+            "Paper-like document style"
+          ],
           "default": "default",
           "description": "Preview style preset for the MDLint preview. Options: default, github, notion, tokyo-night, obsidian, paper."
         },
