@@ -2074,6 +2074,19 @@ body.theme-auto.style-typora .outline-panel {
   transform: translateY(0) scale(0.96);
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.floating-refresh.spinning {
+  animation: spin 0.6s linear;
+}
+
 .floating-trigger:hover {
   opacity: 1;
   background: color-mix(in srgb, var(--accent) 14%, var(--panel));

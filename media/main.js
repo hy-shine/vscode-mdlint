@@ -97,7 +97,11 @@ styleOptions.addEventListener('click', (e) => {
 
 // --- Refresh action ---
 floatingRefresh.addEventListener('click', () => {
+  floatingRefresh.classList.add('spinning');
   vscode.postMessage({ type: 'refreshPreview' });
+  floatingRefresh.addEventListener('animationend', () => {
+    floatingRefresh.classList.remove('spinning');
+  }, { once: true });
 });
 
 // --- Export action ---
