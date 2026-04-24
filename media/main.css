@@ -118,11 +118,15 @@ select {
 .preview-content {
   width: min(920px, calc(100% - 32px));
   margin: 0 auto;
-  padding: var(--preview-top-inset) 0 64px;
+  padding: 18px 0 64px;
   line-height: 1.7;
   font-size: 15px;
   overflow-wrap: break-word;
   scroll-padding-top: calc(var(--preview-top-inset) + 8px);
+}
+
+.preview-content > :first-child {
+  margin-top: 0;
 }
 
 .preview-content img,

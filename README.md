@@ -1,8 +1,12 @@
 # markdown-lint
 
-| | |
-|:---:|:---:|
-| ![Dark Mode Preview](./images/hero-dark.png) | ![Light Mode Preview](./images/hero-light.png) |
+<p align="center">
+  <img src="./images/hero-dark.png" width="49%" alt="Dark Mode Preview">
+  <img src="./images/hero-light.png" width="49%" alt="Light Mode Preview">
+</p>
+<p align="center">
+  <em>Dark Mode Preview</em>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<em>Light Mode Preview</em>
+</p>
 
 A polished Markdown preview extension for VS Code. Open a side panel with live rendering, table of contents, scroll sync, multiple themes, math formulas, code highlighting, and one-click HTML export.
 

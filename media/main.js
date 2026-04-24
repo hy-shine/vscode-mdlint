@@ -148,6 +148,14 @@ window.addEventListener('message', (event) => {
   const state = message.payload;
   currentState = state;
   document.title = state.title;
+  if (state.baseUrl) {
+    let base = document.querySelector('base');
+    if (!base) {
+      base = document.createElement('base');
+      document.head.appendChild(base);
+    }
+    base.href = state.baseUrl;
+  }
   setBodyPresentation(state.themeMode, state.previewStyle);
   syncFloatingMenu(state.themeMode, state.previewStyle);
   previewContent.innerHTML = state.html;

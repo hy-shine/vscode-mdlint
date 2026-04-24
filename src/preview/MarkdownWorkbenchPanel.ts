@@ -91,6 +91,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
       themeMode: config.themeMode,
       previewStyle: config.previewStyle,
       tocVisible: config.showToc,
+      baseUrl: this.panel.webview.asWebviewUri(baseUri).toString() + '/',
     };
 
     await this.panel.webview.postMessage({ type: 'render', payload: state });
@@ -171,10 +172,12 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
         if (!this.sourceUri) {
           return;
         }
-        const doc = await vscode.workspace.openTextDocument(this.sourceUri);
         const editor = vscode.window.visibleTextEditors.find(
           (e) => e.document.uri.toString() === this.sourceUri?.toString(),
-        ) ?? await vscode.window.showTextDocument(doc, { preserveFocus: true, preview: false });
+        );
+        if (!editor) {
+          return;
+        }
         const position = new vscode.Position(message.value, 0);
         editor.selection = new vscode.Selection(position, position);
         editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
@@ -184,10 +187,12 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
         if (!this.sourceUri) {
           return;
         }
-        const doc = await vscode.workspace.openTextDocument(this.sourceUri);
         const editor = vscode.window.visibleTextEditors.find(
           (e) => e.document.uri.toString() === this.sourceUri?.toString(),
-        ) ?? await vscode.window.showTextDocument(doc, { preserveFocus: true, preview: false });
+        );
+        if (!editor) {
+          return;
+        }
         const line = Math.min(message.value, editor.document.lineCount - 1);
         const position = new vscode.Position(line, 0);
         editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.Default);
@@ -197,10 +202,12 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
         if (!this.sourceUri) {
           return;
         }
-        const document = await vscode.workspace.openTextDocument(this.sourceUri);
         const editor = vscode.window.visibleTextEditors.find(
           (e) => e.document.uri.toString() === this.sourceUri?.toString(),
-        ) ?? await vscode.window.showTextDocument(document, { preserveFocus: true, preview: false });
+        );
+        if (!editor) {
+          return;
+        }
         this.isScrollingFromPreview = true;
         const line = Math.min(message.value, editor.document.lineCount - 1);
         const position = new vscode.Position(line, 0);

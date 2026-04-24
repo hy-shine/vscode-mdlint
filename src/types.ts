@@ -17,4 +17,5 @@ export interface PreviewState {
   themeMode: ThemeMode;
   previewStyle: PreviewStyle;
   tocVisible: boolean;
+  baseUrl: string;
 }
