@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.1] - 2026-04-24
+
+### Added
+- Clickable link support in preview panel
+- Spin animation on refresh button for visual feedback
+
+### Fixed
+- Improve preview sync between editor and preview
+- TOC deduplication to prevent duplicate entries
+
 ## [0.2.0] - 2026-04-23
 
 ### Added
