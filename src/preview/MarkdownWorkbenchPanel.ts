@@ -226,6 +226,40 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
           await exportHtml(this.sourceUri, this.context);
         }
         return;
+      case 'openLink': {
+        const href = message.value;
+        // Network links: open in browser
+        if (/^https?:/i.test(href)) {
+          await vscode.env.openExternal(vscode.Uri.parse(href));
+          return;
+        }
+        // Mailto links: let system handle
+        if (/^mailto:/i.test(href)) {
+          await vscode.env.openExternal(vscode.Uri.parse(href));
+          return;
+        }
+        // Local files
+        if (!this.sourceUri) {
+          return;
+        }
+        const linkUri = vscode.Uri.joinPath(vscode.Uri.joinPath(this.sourceUri, '..'), href);
+        try {
+          await vscode.workspace.fs.stat(linkUri);
+        } catch {
+          void vscode.window.showWarningMessage(`Linked file not found: ${href}`);
+          return;
+        }
+        try {
+          const doc = await vscode.workspace.openTextDocument(linkUri);
+          const editor = await vscode.window.showTextDocument(doc);
+          if (doc.languageId === 'markdown') {
+            await this.reveal(editor);
+          }
+        } catch {
+          await vscode.env.openExternal(linkUri);
+        }
+        return;
+      }
       default:
         return;
     }
@@ -364,7 +398,8 @@ type WebviewMessage =
   | { type: 'scrollToLine'; value: number }
   | { type: 'syncEditorScroll'; value: number }
   | { type: 'refreshPreview' }
-  | { type: 'exportHtml' };
+  | { type: 'exportHtml' }
+  | { type: 'openLink'; value: string };
 
 function getNonce(): string {
   return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);

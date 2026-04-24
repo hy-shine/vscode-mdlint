@@ -118,6 +118,29 @@ formatButton.addEventListener('click', () => {
   collapseAllGroups();
 });
 
+previewContent.addEventListener('click', (e) => {
+  const link = e.target.closest('a');
+  if (!link) {
+    return;
+  }
+
+  const href = link.getAttribute('href');
+  if (!href) {
+    return;
+  }
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (href.startsWith('#')) {
+    const target = document.getElementById(href.slice(1));
+    target?.scrollIntoView({ block: 'nearest' });
+    return;
+  }
+
+  vscode.postMessage({ type: 'openLink', value: href });
+});
+
 window.addEventListener('message', (event) => {
   const message = event.data;
 
