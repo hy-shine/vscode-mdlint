@@ -102,8 +102,9 @@ export function renderMarkdown(
     return `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(text)}"${titleAttr}>`;
   };
 
+  const stripped = stripFrontMatter(markdown);
   return {
-    html: marked.parse(markdown, { renderer }) as string,
+    html: marked.parse(stripped, { renderer }) as string,
   };
 }
 
@@ -147,6 +148,34 @@ function annotateShellCommands(html: string): string {
   return html.replace(shellCommandRe, (match) => {
     return `<span class="hljs-command">${match}</span>`;
   });
+}
+
+function stripFrontMatter(markdown: string): string {
+  const normalized = markdown.charCodeAt(0) === 0xfeff ? markdown.slice(1) : markdown;
+  const match = normalized.match(/^---\r?\n([\s\S]*?)\r?\n(?:---|\.\.\.)\r?\n?/);
+  if (!match) {
+    return markdown;
+  }
+
+  const body = match[1];
+  const lines = body.split(/\r?\n/).filter((line) => line.trim().length > 0);
+  if (lines.length === 0) {
+    return markdown;
+  }
+
+  const isYamlLike = lines.every((line) => {
+    const trimmed = line.trim();
+    return /^#/.test(trimmed)
+      || /^[A-Za-z0-9_.-]+\s*:/.test(trimmed)
+      || /^-\s+/.test(trimmed)
+      || /^\s+/.test(line);
+  });
+
+  if (!isYamlLike) {
+    return markdown;
+  }
+
+  return normalized.slice(match[0].length);
 }
 
 function escapeHtml(value: string): string {
