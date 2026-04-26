@@ -185,6 +185,7 @@ window.addEventListener('message', (event) => {
   renderToc(state.toc);
   renderMermaidDiagrams();
   setupCodeCopyButtons();
+  setupCodeFoldButtons();
   updateActiveTocLink();
 });
 
@@ -891,6 +892,21 @@ function setupCodeCopyButtons() {
           button.textContent = 'Copy';
         }, 2000);
       }
+    });
+  }
+}
+
+function setupCodeFoldButtons() {
+  const foldButtons = previewContent.querySelectorAll('.code-fold-toggle');
+  for (const button of foldButtons) {
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pre = button.closest('pre');
+      if (!pre) { return; }
+      const isFolded = pre.getAttribute('data-folded') === 'true';
+      pre.setAttribute('data-folded', String(!isFolded));
+      button.setAttribute('aria-expanded', String(isFolded));
+      button.textContent = isFolded ? 'Collapse' : 'Expand';
     });
   }
 }

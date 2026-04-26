@@ -230,6 +230,80 @@ select {
   border-color: var(--accent);
 }
 
+/* ===== Code Fold Toggle ===== */
+.code-fold-toggle {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 2;
+  padding: 3px 10px;
+  font-size: 12px;
+  line-height: 1;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--panel) 90%, transparent);
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.preview-content pre:hover .code-fold-toggle,
+.preview-content pre:focus-within .code-fold-toggle {
+  opacity: 1;
+}
+
+.code-fold-toggle:hover {
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Folded code block: clipped height with fade-out */
+.preview-content pre[data-foldable][data-folded="true"] code {
+  max-height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.preview-content pre[data-foldable][data-folded="true"]::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--code-bg));
+  pointer-events: none;
+}
+
+.preview-content pre[data-foldable]:not([data-folded="true"]) code {
+  max-height: none;
+}
+
+/* ===== Code Line Numbers ===== */
+.preview-content pre {
+  counter-reset: code-line;
+}
+
+.code-line {
+  display: inline;
+}
+
+.code-line::before {
+  counter-increment: code-line;
+  content: counter(code-line);
+  display: inline-block;
+  width: 3.5em;
+  text-align: right;
+  padding-right: 1.2em;
+  color: var(--muted);
+  opacity: 0.4;
+  font-size: 0.85em;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 /* ===== hljs: Atom One Dark (default / dark) ===== */
 .hljs {
   color: #abb2bf;

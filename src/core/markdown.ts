@@ -89,8 +89,13 @@ export function renderMarkdown(
     if (language === 'bash' || language === 'sh' || language === 'zsh') {
       highlighted = annotateShellCommands(highlighted);
     }
+    const lineCount = text.split('\n').length;
+    const isFoldable = lineCount > 10;
+    const foldAttrs = isFoldable ? ' data-foldable data-folded="true"' : '';
+    const lines = wrapHighlightedLines(highlighted);
     const copyButton = `<button class="code-copy-button" data-code="${escapeAttribute(text)}" aria-label="Copy code">Copy</button>`;
-    return `<pre>${copyButton}<code class="hljs language-${escapeAttribute(language)}">${highlighted}</code></pre>`;
+    const foldButton = isFoldable ? `<button class="code-fold-toggle" aria-expanded="false" aria-label="Expand code">Expand</button>` : '';
+    return `<pre${foldAttrs}>${copyButton}${foldButton}<code class="hljs language-${escapeAttribute(language)}">${lines}</code></pre>`;
   };
   renderer.image = ({ href, title, text }: Tokens.Image) => {
     let src = href;
@@ -148,6 +153,13 @@ function annotateShellCommands(html: string): string {
   return html.replace(shellCommandRe, (match) => {
     return `<span class="hljs-command">${match}</span>`;
   });
+}
+
+function wrapHighlightedLines(html: string): string {
+  const rawLines = html.split('\n');
+  return rawLines
+    .map((line) => `<span class="code-line">${line}</span>`)
+    .join('\n');
 }
 
 function stripFrontMatter(markdown: string): string {
