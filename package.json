@@ -1,6 +1,6 @@
 {
   "name": "markdown-lint",
-  "displayName": "Markdown Lint Preview",
+  "displayName": "Markdown Preview",
   "description": "Enhanced Markdown preview with multiple themes, table of contents, math formulas, code highlighting, and export capabilities.",
   "version": "0.2.1",
   "publisher": "hyshine",
@@ -37,8 +37,11 @@
     "commands": [
       {
         "command": "markdown-lint.openPreview",
-        "title": "Open Preview",
-        "icon": "$(open-preview)"
+        "title": "Preview with Markdown Lint",
+        "icon": {
+          "light": "images/open-preview.svg",
+          "dark": "images/open-preview-dark.svg"
+        }
       },
       {
         "command": "markdown-lint.formatDocument",

@@ -28,10 +28,8 @@
 
 ### Changed
 - Rename extension from md-lint to markdown-lint
-- Update displayName to 'Markdown Lint Preview'
 - Add keywords: preview, mermaid, formatter
 - Update repository URLs to vscode-markdown-lint
-- Update user-facing messages to use 'markdown lint preview'
 - Remove debug console.log statements from extension.ts
 
 ## [0.1.0] - 2026-04-23

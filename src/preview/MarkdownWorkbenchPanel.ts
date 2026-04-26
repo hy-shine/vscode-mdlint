@@ -49,7 +49,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
       this.panel.webview.html = this.getHtml(this.panel.webview);
     }
 
-    this.panel.title = `markdown lint preview ${editor.document.fileName.split(/[\\/]/).pop() ?? 'Preview'}`;
+    this.panel.title = `MD Lint ${editor.document.fileName.split(/[\\/]/).pop() ?? 'Preview'}`;
     this.panel.reveal(vscode.ViewColumn.Beside);
     void this.update(editor);
   }
@@ -306,7 +306,7 @@ export class MarkdownWorkbenchPanel implements vscode.Disposable {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="${styleUri}" rel="stylesheet" />
     <link href="${katexStyleUri}" rel="stylesheet" />
-    <title>markdown lint preview</title>
+    <title>MD Lint</title>
   </head>
   <body>
     <div class="outline-control" id="outline-control">
