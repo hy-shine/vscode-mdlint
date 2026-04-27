@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0] - 2026-04-27
+
+### Added
+- Code block folding for blocks with more than 10 lines
+- Line numbers in code blocks
+- Hide YAML front matter in preview
+- Custom SVG icon for preview command
+
 ## [0.2.1] - 2026-04-24
 
 ### Added
